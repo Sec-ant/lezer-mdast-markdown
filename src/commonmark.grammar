@@ -10,7 +10,7 @@ block {
   Blockquote |
   Code |
   List |
-  HtmlBlock |
+  Html |
   Paragraph | 
   ThematicBreak
 }
@@ -28,7 +28,7 @@ Code {
 }
 List { listOpen listItemContent+ listClose }
 listItemContent { listItemOpen listItemText listItemClose }
-HtmlBlock { htmlContent }
+Html { htmlContent }
 Paragraph { phrasing }  
 ThematicBreak { thematicBreak }
 

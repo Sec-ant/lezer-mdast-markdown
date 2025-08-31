@@ -580,10 +580,7 @@ export function synthesizeStructuralEvents(
       }
       continue;
     }
-    if (
-      (tt === "codeFencedValue" || tt === "codeFlowValue") &&
-      ev.type === "exit"
-    ) {
+    if (tt === "codeFencedValue" && ev.type === "exit") {
       if (fence) fence.content.push({ start: ev.start, end: ev.end });
     }
     // Handle inline elements
@@ -627,6 +624,16 @@ export function synthesizeStructuralEvents(
       });
       continue;
     }
+    if (tt === "autolink" && ev.type === "exit") {
+      out.push({
+        type: "exit",
+        tokenType: "link",
+        start: ev.start,
+        end: ev.end,
+        value: text.slice(ev.start, ev.end),
+      });
+      continue;
+    }
     if (tt === "image" && ev.type === "exit") {
       out.push({
         type: "exit",
@@ -647,6 +654,10 @@ export function synthesizeStructuralEvents(
       });
       continue;
     }
+    if (tt === "htmlFlow" && ev.type === "enter") {
+      flushParagraph(ev.start);
+      continue;
+    }
     if (tt === "htmlFlow" && ev.type === "exit") {
       out.push({
         type: "exit",
@@ -655,6 +666,7 @@ export function synthesizeStructuralEvents(
         end: ev.end,
         value: text.slice(ev.start, ev.end),
       });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
       continue;
     }
     // Handle text data
