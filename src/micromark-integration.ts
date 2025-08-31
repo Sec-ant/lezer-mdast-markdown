@@ -90,6 +90,7 @@ export function synthesizeStructuralEvents(
   let fence: FenceState | null = null;
   let paragraphStart: number | null = null;
   let lastEmittedEnd = 0;
+  let codeTextData: string[] = [];
 
   function flushParagraph(endPos: number) {
     if (paragraphStart === null) return;
@@ -604,14 +605,25 @@ export function synthesizeStructuralEvents(
       });
       continue;
     }
+    if (tt === "codeText" && ev.type === "enter") {
+      codeTextData = []; // Reset for new code span
+      continue;
+    }
+    if (tt === "codeTextData" && ev.type === "exit") {
+      codeTextData.push(ev.value || "");
+      continue;
+    }
     if (tt === "codeText" && ev.type === "exit") {
+      // Use collected codeTextData instead of full content
+      const content = codeTextData.join("");
       out.push({
         type: "exit",
         tokenType: "inlineCode",
         start: ev.start,
         end: ev.end,
-        value: text.slice(ev.start, ev.end),
+        value: content,
       });
+      codeTextData = []; // Clear after use
       continue;
     }
     if (tt === "link" && ev.type === "exit") {
