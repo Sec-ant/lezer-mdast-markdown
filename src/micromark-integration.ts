@@ -331,6 +331,45 @@ export function synthesizeStructuralEvents(
                 lastEmittedEnd = Math.max(lastEmittedEnd, textEnd);
               }
             }
+          } else if (tt === "setextHeading") {
+            // Handle setext headings like "Foo\n==="
+            const headingFullText = text.slice(ev.start, end);
+            const lines = headingFullText.split("\n");
+            if (lines.length >= 2) {
+              const textContent = lines[0]; // "Foo"
+              const markers = lines[1]; // "==="
+
+              // Generate headingText token for the text content
+              if (textContent?.trim()) {
+                out.push({
+                  type: "exit",
+                  tokenType: "headingText",
+                  start: ev.start,
+                  end: ev.start + textContent.length,
+                  value: textContent,
+                });
+                lastEmittedEnd = Math.max(
+                  lastEmittedEnd,
+                  ev.start + textContent.length,
+                );
+              }
+
+              // Generate headingMarkers token for the underline
+              if (markers?.trim()) {
+                const markersStart = ev.start + textContent.length + 1; // +1 for \n
+                out.push({
+                  type: "exit",
+                  tokenType: "headingMarkers",
+                  start: markersStart,
+                  end: markersStart + markers.length,
+                  value: markers,
+                });
+                lastEmittedEnd = Math.max(
+                  lastEmittedEnd,
+                  markersStart + markers.length,
+                );
+              }
+            }
           }
         }
       }
