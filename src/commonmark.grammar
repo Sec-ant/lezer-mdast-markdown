@@ -16,30 +16,35 @@ block {
 }
 
 // Block elements following mdast structure
-Heading { headingMarkers Text { headingText } }
+Heading { headingMarkers phrasing }
 Blockquote { blockQuoteMarker blockquoteContent+ }
 blockquoteContent {
-  Heading { blockQuoteHeadingMarkers Text { blockQuoteHeadingText } } | 
-  Paragraph { Text { blockQuoteParagraphText } }
+  Heading { blockQuoteHeadingMarkers blockQuoteHeadingText } | 
+  Paragraph { blockQuoteParagraphText }
 }
 Code { 
   codeFenceOpen codeLanguage? codeContent codeFenceClose |
   codeBlockText
 }
 List { listOpen listItemContent+ listClose }
-listItemContent { listItemOpen Text { listItemText } listItemClose }
+listItemContent { listItemOpen listItemText listItemClose }
 HtmlBlock { htmlContent }
-Paragraph { Text { paragraphText } }  
+Paragraph { phrasing }  
 ThematicBreak { thematicBreak }
 
-// Text content
-Text { 
-  headingText |
-  blockQuoteHeadingText |
-  blockQuoteParagraphText |
-  paragraphText |
-  listItemText |
-  textContent
+// Inline content (phrasing)
+phrasing {
+  Text { 
+    headingText |
+    paragraphText |
+    textContent
+  } |
+  Emphasis { emphasis } |
+  Strong { strong } |
+  InlineCode { inlineCode } |
+  Link { link } |
+  Image { image } |
+  CharacterEscape { characterEscape }
 }
 
 @external tokens micromarkTokenizer from "./micromark-tokenizer" {
@@ -62,6 +67,12 @@ Text {
   htmlContent,
   paragraphText,
   textContent,
+  emphasis,
+  strong,
+  inlineCode,
+  link,
+  image,
+  characterEscape,
   thematicBreak,
   whitespace
 }

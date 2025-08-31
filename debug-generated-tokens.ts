@@ -5,16 +5,20 @@ import { parseMicromark } from "./src/micromark-integration";
 
 const testCases = [
   {
-    name: "Simple heading",
-    text: "# Hello",
+    name: "Simple emphasis",
+    text: "*Hello*",
   },
   {
-    name: "Simple paragraph",
-    text: "Hello world",
+    name: "Strong text",
+    text: "**Hello**",
   },
   {
-    name: "List",
-    text: "- Item 1\n- Item 2",
+    name: "Inline code",
+    text: "`code`",
+  },
+  {
+    name: "Mix emphasis in paragraph",
+    text: "This is *emphasized* text",
   },
 ];
 

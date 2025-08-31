@@ -202,6 +202,18 @@ function mapToLezerToken(tokenType: string): number | null {
       return terms.paragraphText;
     case "textContent":
       return terms.textContent;
+    case "emphasis":
+      return terms.emphasis;
+    case "strong":
+      return terms.strong;
+    case "inlineCode":
+      return terms.inlineCode;
+    case "link":
+      return terms.link;
+    case "image":
+      return terms.image;
+    case "characterEscape":
+      return terms.characterEscape;
     case "thematicBreak":
       return terms.thematicBreak;
     case "whitespace":

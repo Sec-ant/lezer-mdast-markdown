@@ -96,7 +96,7 @@ export function synthesizeStructuralEvents(
     if (paragraphStart === null) return;
     const raw = text.slice(paragraphStart, endPos).replace(/\n+$/, "");
     if (raw.trim().length > 0) {
-      // Check if this paragraph is in a list - if so, don't flush it as regular paragraph
+      // Check if this paragraph is in a list or blockquote - if so, don't flush it as regular paragraph
       const isInList = events.some(
         (e) =>
           (e.tokenType === "listOrdered" || e.tokenType === "listUnordered") &&
@@ -105,7 +105,15 @@ export function synthesizeStructuralEvents(
           e.end >= endPos,
       );
 
-      if (!isInList) {
+      const isInBlockquote = events.some(
+        (e) =>
+          e.tokenType === "blockQuote" &&
+          e.type === "enter" &&
+          e.start <= paragraphStart &&
+          e.end >= endPos,
+      );
+
+      if (!isInList && !isInBlockquote) {
         // Remove blockquote markers from paragraph content
         let cleanedContent = raw;
 
@@ -414,8 +422,8 @@ export function synthesizeStructuralEvents(
           });
           lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
           currentListItemStart = null;
-        } else if (isInBlockquote) {
-          // Generate blockquote-specific paragraph token
+        } else if (isInBlockquote && !isInList) {
+          // Generate blockquote-specific paragraph token only - no duplicate paragraph token
           const raw = text.slice(ev.start, ev.end).replace(/\n+$/, "");
           if (raw.trim().length > 0) {
             // Clean the paragraph content by removing blockquote markers
