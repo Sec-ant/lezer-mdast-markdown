@@ -1,0 +1,1 @@
+../.verdent/project_rules.md

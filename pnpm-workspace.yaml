@@ -1,0 +1,9 @@
+onlyBuiltDependencies:
+  - esbuild
+  - simple-git-hooks
+
+patchedDependencies:
+  unplugin-lezer: patches/unplugin-lezer.patch
+
+publicHoistPattern:
+  - '@changesets/config'

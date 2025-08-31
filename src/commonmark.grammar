@@ -1,0 +1,40 @@
+// CommonMark Grammar aligned with mdast structure
+// Following Lezer Guide principles for context-sensitive parsing
+
+@top Root { block* }
+
+@skip { whitespace }
+
+block { 
+  Heading | 
+  Blockquote |
+  Code |
+  Paragraph | 
+  ThematicBreak
+}
+
+blockquoteContent {
+  Heading { blockQuoteHeadingMarkers Text { blockQuoteHeadingText } } | 
+  Paragraph { Text { blockQuoteParagraphText } }
+}
+
+// Following mdast structure: Heading contains Text child, Paragraph contains Text child
+Heading { headingMarkers Text { headingText } }
+// Single marker followed by one or more content blocks
+Blockquote { blockQuoteMarker blockquoteContent+ }
+Code { codeBlockText }
+Paragraph { Text { paragraphText } }  
+ThematicBreak { thematicBreak }
+
+@external tokens micromarkTokenizer from "./micromark-tokenizer" {
+  headingMarkers,
+  headingText,
+  blockQuoteMarker,
+  blockQuoteHeadingMarkers,
+  blockQuoteHeadingText,
+  blockQuoteParagraphText,
+  codeBlockText,
+  paragraphText,
+  thematicBreak,
+  whitespace
+}

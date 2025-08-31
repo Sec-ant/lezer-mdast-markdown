@@ -1,0 +1,14 @@
+diff --git a/dist/chunk-HLXNQ6LD.js b/dist/chunk-HLXNQ6LD.js
+index 9f8bc008bfc60e1a1c8f22ca13732e1db5aff77d..7a5ae36eb84182712bbc39576af5a27657b9863f 100644
+--- a/dist/chunk-HLXNQ6LD.js
++++ b/dist/chunk-HLXNQ6LD.js
+@@ -7,6 +7,9 @@ import { buildParserFile } from "@lezer/generator";
+ var unpluginFactory = () => ({
+   name: "unplugin-lezer",
+   resolveId(source, importer) {
++    if (source.startsWith('\0')) {
++      return source;
++    }
+     const m = /^(.*\.grammar)(\.terms)?$/.exec(source);
+     if (!m) return null;
+     const id = resolve(importer ? dirname(importer) : process.cwd(), m[1]);
