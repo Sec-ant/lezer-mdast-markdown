@@ -90,18 +90,19 @@ export function synthesizeStructuralEvents(
   let fence: FenceState | null = null;
   let paragraphStart: number | null = null;
   let lastEmittedEnd = 0;
-  let currentListItemStart: number | null = null;
 
   function flushParagraph(endPos: number) {
     if (paragraphStart === null) return;
-    const raw = text.slice(paragraphStart, endPos).replace(/\n+$/, "");
+
+    const startPos = paragraphStart;
+    const raw = text.slice(startPos, endPos).replace(/\n+$/, "");
     if (raw.trim().length > 0) {
       // Check if this paragraph is in a list or blockquote - if so, don't flush it as regular paragraph
       const isInList = events.some(
         (e) =>
           (e.tokenType === "listOrdered" || e.tokenType === "listUnordered") &&
           e.type === "enter" &&
-          e.start <= paragraphStart &&
+          e.start <= startPos &&
           e.end >= endPos,
       );
 
@@ -109,7 +110,7 @@ export function synthesizeStructuralEvents(
         (e) =>
           e.tokenType === "blockQuote" &&
           e.type === "enter" &&
-          e.start <= paragraphStart &&
+          e.start <= startPos &&
           e.end >= endPos,
       );
 
@@ -133,11 +134,11 @@ export function synthesizeStructuralEvents(
         }
 
         // Find the actual start and end positions for the cleaned content
-        const paraStart = paragraphStart + (raw.match(/^\s*/)?.[0].length || 0);
+        const paraStart = startPos + (raw.match(/^\s*/)?.[0].length || 0);
 
         // For the end position, we need to account for the cleaned content
         // but still use the original positions for token boundaries
-        const paraEnd = paragraphStart + raw.length;
+        const paraEnd = startPos + raw.length;
 
         if (paraEnd > paraStart && cleanedContent.trim().length > 0) {
           // Generate paragraphText token for paragraph content
@@ -403,7 +404,6 @@ export function synthesizeStructuralEvents(
     // Handle list item prefixes to create list items
     if (tt === "listItemPrefix" && ev.type === "exit") {
       // Generate listItemOpen token after the prefix
-      currentListItemStart = ev.end;
       out.push({
         type: "exit",
         tokenType: "listItemOpen",
@@ -460,7 +460,6 @@ export function synthesizeStructuralEvents(
             value: "",
           });
           lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
-          currentListItemStart = null;
         } else if (isInBlockquote && !isInList) {
           // Generate blockquote-specific paragraph token only - no duplicate paragraph token
           const raw = text.slice(ev.start, ev.end).replace(/\n+$/, "");
@@ -581,7 +580,10 @@ export function synthesizeStructuralEvents(
       }
       continue;
     }
-    if (tt === "codeFencedValue" && ev.type === "exit") {
+    if (
+      (tt === "codeFencedValue" || tt === "codeFlowValue") &&
+      ev.type === "exit"
+    ) {
       if (fence) fence.content.push({ start: ev.start, end: ev.end });
     }
     // Handle inline elements
