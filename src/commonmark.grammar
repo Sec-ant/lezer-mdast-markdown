@@ -9,22 +9,38 @@ block {
   Heading | 
   Blockquote |
   Code |
+  List |
+  HtmlBlock |
   Paragraph | 
   ThematicBreak
 }
 
+// Block elements following mdast structure
+Heading { headingMarkers Text { headingText } }
+Blockquote { blockQuoteMarker blockquoteContent+ }
 blockquoteContent {
   Heading { blockQuoteHeadingMarkers Text { blockQuoteHeadingText } } | 
   Paragraph { Text { blockQuoteParagraphText } }
 }
-
-// Following mdast structure: Heading contains Text child, Paragraph contains Text child
-Heading { headingMarkers Text { headingText } }
-// Single marker followed by one or more content blocks
-Blockquote { blockQuoteMarker blockquoteContent+ }
-Code { codeBlockText }
+Code { 
+  codeFenceOpen codeLanguage? codeContent codeFenceClose |
+  codeBlockText
+}
+List { listOpen listItemContent+ listClose }
+listItemContent { listItemOpen Text { listItemText } listItemClose }
+HtmlBlock { htmlContent }
 Paragraph { Text { paragraphText } }  
 ThematicBreak { thematicBreak }
+
+// Text content
+Text { 
+  headingText |
+  blockQuoteHeadingText |
+  blockQuoteParagraphText |
+  paragraphText |
+  listItemText |
+  textContent
+}
 
 @external tokens micromarkTokenizer from "./micromark-tokenizer" {
   headingMarkers,
@@ -33,8 +49,19 @@ ThematicBreak { thematicBreak }
   blockQuoteHeadingMarkers,
   blockQuoteHeadingText,
   blockQuoteParagraphText,
+  codeFenceOpen,
+  codeLanguage,
+  codeContent,
+  codeFenceClose,
   codeBlockText,
+  listOpen,
+  listItemOpen,
+  listItemText,
+  listItemClose,
+  listClose,
+  htmlContent,
   paragraphText,
+  textContent,
   thematicBreak,
   whitespace
 }

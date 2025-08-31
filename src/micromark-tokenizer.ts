@@ -176,10 +176,32 @@ function mapToLezerToken(tokenType: string): number | null {
       return terms.blockQuoteHeadingText;
     case "blockQuoteParagraphText":
       return terms.blockQuoteParagraphText;
+    case "codeFenceOpen":
+      return terms.codeFenceOpen;
+    case "codeLanguage":
+      return terms.codeLanguage;
+    case "codeContent":
+      return terms.codeContent;
+    case "codeFenceClose":
+      return terms.codeFenceClose;
     case "codeBlockText":
       return terms.codeBlockText;
+    case "listOpen":
+      return terms.listOpen;
+    case "listItemOpen":
+      return terms.listItemOpen;
+    case "listItemText":
+      return terms.listItemText;
+    case "listItemClose":
+      return terms.listItemClose;
+    case "listClose":
+      return terms.listClose;
+    case "htmlContent":
+      return terms.htmlContent;
     case "paragraphText":
       return terms.paragraphText;
+    case "textContent":
+      return terms.textContent;
     case "thematicBreak":
       return terms.thematicBreak;
     case "whitespace":
