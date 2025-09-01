@@ -375,32 +375,11 @@ export function synthesizeStructuralEvents(
           });
           lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
         } else {
-          // Check if this paragraph contains inline elements
-          const hasInlineElements = events.some(e => 
-            e.start >= ev.start && e.end <= ev.end &&
-            (e.tokenType === "emphasis" || e.tokenType === "strong" || 
-             e.tokenType === "codeText" || e.tokenType === "link" || 
-             e.tokenType === "image" || e.tokenType === "autolink")
-          );
-          
-          if (!hasInlineElements) {
-            // Generate paragraphText token only for plain text paragraphs
-            const paragraphContent = text.slice(ev.start, ev.end).trim();
-            if (paragraphContent.length > 0) {
-              out.push({
-                type: "exit",
-                tokenType: "paragraphText",
-                start: ev.start,
-                end: ev.end,
-                value: paragraphContent,
-              });
-              lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
-            }
-          }
-          // For paragraphs with inline elements, the individual inline tokens will be generated
-          // and the Text tokens for plain text segments will be handled by the data handler
+          // For all paragraphs, let the grammar handle the structure
+          // Don't generate paragraphText tokens here - let the individual inline and text tokens be processed
+          // The grammar will combine them into the proper paragraph structure
         }
-        
+
         currentParagraph = null;
       }
       continue;
@@ -608,7 +587,7 @@ export function synthesizeStructuralEvents(
       continue;
     }
     if (tt === "link" && ev.type === "enter") {
-      // Generate link opening token  
+      // Generate link opening token
       out.push({
         type: "exit",
         tokenType: "linkOpen",
@@ -633,7 +612,10 @@ export function synthesizeStructuralEvents(
             end: ev.start + 1 + linkText.length,
             value: linkText,
           });
-          lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 1 + linkText.length);
+          lastEmittedEnd = Math.max(
+            lastEmittedEnd,
+            ev.start + 1 + linkText.length,
+          );
         }
       }
       // Generate link closing token
@@ -702,7 +684,10 @@ export function synthesizeStructuralEvents(
             end: ev.start + 2 + imageText.length,
             value: imageText,
           });
-          lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 2 + imageText.length);
+          lastEmittedEnd = Math.max(
+            lastEmittedEnd,
+            ev.start + 2 + imageText.length,
+          );
         }
       }
       // Generate image closing token
@@ -740,51 +725,48 @@ export function synthesizeStructuralEvents(
       lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
       continue;
     }
-    // Handle text data - generate textContent tokens for plain text within paragraphs that have inline elements
+    // Handle text data - generate textContent tokens for all text within paragraphs
     if (tt === "data" && ev.type === "exit") {
-      // Only generate textContent if we're inside a paragraph that contains inline elements
+      // Generate textContent for all data inside paragraphs
       if (currentParagraph) {
-        // Check if this paragraph contains inline elements
-        const paragraphHasInlineElements = events.some(e => 
-          e.start >= currentParagraph!.start && e.end <= currentParagraph!.end &&
-          (e.tokenType === "emphasis" || e.tokenType === "strong" || 
-           e.tokenType === "codeText" || e.tokenType === "link" || 
-           e.tokenType === "image" || e.tokenType === "autolink")
-        );
-        
-        if (paragraphHasInlineElements) {
-          // Check if this data is inside any inline element by looking at the event stack
-          const isInsideInline = events.some((checkEvent, idx) => {
-            const currentIdx = events.indexOf(ev);
-            return checkEvent.type === "enter" && 
-                   (checkEvent.tokenType === "emphasis" || checkEvent.tokenType === "strong" ||
-                    checkEvent.tokenType === "codeText" || checkEvent.tokenType === "link" ||
-                    checkEvent.tokenType === "image" || checkEvent.tokenType === "autolink") &&
-                   idx < currentIdx &&
-                   checkEvent.start <= ev.start &&
-                   checkEvent.end >= ev.end &&
-                   !events.slice(idx + 1, currentIdx).some(exitEvent => 
-                     exitEvent.type === "exit" && exitEvent.tokenType === checkEvent.tokenType
-                   );
-          });
-          
-          if (!isInsideInline) {
-            const textValue = ev.value || text.slice(ev.start, ev.end);
-            if (textValue.trim().length > 0) {
-              out.push({
-                type: "exit",
-                tokenType: "textContent",
-                start: ev.start,
-                end: ev.end,
-                value: textValue,
-              });
-              lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
-            }
+        // Check if this data is inside any inline element by looking at the event stack
+        const isInsideInline = events.some((checkEvent, idx) => {
+          const currentIdx = events.indexOf(ev);
+          return (
+            checkEvent.type === "enter" &&
+            (checkEvent.tokenType === "emphasis" ||
+              checkEvent.tokenType === "strong" ||
+              checkEvent.tokenType === "codeText" ||
+              checkEvent.tokenType === "link" ||
+              checkEvent.tokenType === "image" ||
+              checkEvent.tokenType === "autolink") &&
+            idx < currentIdx &&
+            checkEvent.start <= ev.start &&
+            checkEvent.end >= ev.end &&
+            !events
+              .slice(idx + 1, currentIdx)
+              .some(
+                (exitEvent) =>
+                  exitEvent.type === "exit" &&
+                  exitEvent.tokenType === checkEvent.tokenType,
+              )
+          );
+        });
+
+        if (!isInsideInline) {
+          const textValue = ev.value || text.slice(ev.start, ev.end);
+          if (textValue.trim().length > 0) {
+            out.push({
+              type: "exit",
+              tokenType: "textContent",
+              start: ev.start,
+              end: ev.end,
+              value: textValue,
+            });
+            lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
           }
         }
-        // For paragraphs without inline elements, let paragraphText handle everything
       }
-      continue;
     }
   }
 
@@ -794,7 +776,7 @@ export function synthesizeStructuralEvents(
         ? fence.content[fence.content.length - 1].end
         : fence.openStart,
     );
-  
+
   return out.sort((a, b) => a.start - b.start || a.end - b.end);
 }
 
