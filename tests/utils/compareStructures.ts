@@ -29,11 +29,12 @@ function collectMdast(
     from: node.position?.start?.offset || 0,
     to: node.position?.end?.offset || 0,
     content:
-      node.value ||
-      markdown.slice(
-        node.position?.start?.offset || 0,
-        node.position?.end?.offset || 0,
-      ),
+      node.value !== undefined
+        ? node.value
+        : markdown.slice(
+            node.position?.start?.offset || 0,
+            node.position?.end?.offset || 0,
+          ),
     children: [],
   };
 
@@ -68,7 +69,9 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
     children: [],
   };
 
-  const stack: NormalizedNode[] = [result];
+  const stack: { node: NormalizedNode; type: string }[] = [
+    { node: result, type: "Root" },
+  ];
 
   tree.iterate({
     enter(node: { type: { name: string }; from: number; to: number }) {
@@ -84,6 +87,10 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
 
       // Extract content based on node type
       let content = markdown.slice(node.from, node.to);
+
+      // Get parent context
+      const parentContext = stack[stack.length - 1];
+      const isInsideLink = parentContext?.type === "Link";
 
       // For nodes that contain processed content, we need to re-process
       if (node.type.name === "InlineCode") {
@@ -102,27 +109,27 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
           }
         }
       } else if (node.type.name === "Code") {
-        // For fenced code blocks, extract just the content
-        // Handle both ``` and ~~~ style fences
+        // Handle both fenced and indented code blocks
         const lines = content.split("\n");
-        if (lines.length >= 2) {
+        if (lines.length >= 1) {
           const firstLine = lines[0];
-          const lastLine = lines[lines.length - 1];
 
-          // Extract fence characters and count
-          const fenceMatch = firstLine.match(/^(`{3,}|~{3,})/);
+          // Check if it's a fenced code block first
+          const fenceMatch = firstLine.match(/^(\s{0,3})(`{3,}|~{3,})/);
           if (fenceMatch) {
-            const fenceType = fenceMatch[1][0]; // '`' or '~'
-            const fenceLength = fenceMatch[1].length;
+            // Fenced code block handling
+            const indent = fenceMatch[1];
+            const fenceType = fenceMatch[2][0]; // '`' or '~'
+            const fenceLength = fenceMatch[2].length;
 
             // Look for matching closing fence (must be same type, at least same length)
             const closeFencePattern = new RegExp(
-              `^${fenceType.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}{${fenceLength},}\\s*$`,
+              `^\\s{0,3}${fenceType.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}{${fenceLength},}\\s*$`,
             );
 
-            // Find the last line that matches the closing pattern
+            // Find the first line that matches the closing pattern (not last - first match wins)
             let closeIndex = -1;
-            for (let i = lines.length - 1; i > 0; i--) {
+            for (let i = 1; i < lines.length; i++) {
               if (closeFencePattern.test(lines[i])) {
                 closeIndex = i;
                 break;
@@ -133,50 +140,87 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
               // Extract content between fences
               content = lines.slice(1, closeIndex).join("\n");
             } else {
-              // No matching close fence found - treat as unclosed fenced code
-              // CommonMark spec says to include everything after the opening fence
+              // No matching close fence found - include everything after opening fence
               content = lines.slice(1).join("\n");
             }
+          } else {
+            // Indented code block - remove common leading whitespace (4 spaces minimum)
+            // CommonMark: indented code blocks have each line indented by at least 4 spaces
+            const processedLines = lines.map(line => {
+              // Remove up to 4 leading spaces/tabs (each tab counts as up to 4 spaces)
+              let processed = line;
+              let removed = 0;
+              
+              for (let i = 0; i < line.length && removed < 4; i++) {
+                if (line[i] === ' ') {
+                  removed++;
+                  processed = line.slice(i + 1);
+                } else if (line[i] === '\t') {
+                  removed = 4; // Tab counts as 4 spaces
+                  processed = line.slice(i + 1);
+                  break;
+                } else {
+                  break;
+                }
+              }
+              
+              return processed;
+            });
+            
+            content = processedLines.join("\n");
           }
         }
       } else if (node.type.name === "Text") {
-        // Process backslash escapes
-        content = content
-          .replace(/\\!/g, "!")
-          .replace(/\\"/g, '"')
-          .replace(/\\#/g, "#")
-          .replace(/\\\$/g, "$")
-          .replace(/\\%/g, "%")
-          .replace(/\\&/g, "&")
-          .replace(/\\'/g, "'")
-          .replace(/\\\(/g, "(")
-          .replace(/\\\)/g, ")")
-          .replace(/\\\*/g, "*")
-          .replace(/\\\+/g, "+")
-          .replace(/\\,/g, ",")
-          .replace(/\\-/g, "-")
-          .replace(/\\\./g, ".")
-          .replace(/\\\//g, "/")
-          .replace(/\\:/g, ":")
-          .replace(/\\;/g, ";")
-          .replace(/\\</g, "<")
-          .replace(/\\=/g, "=")
-          .replace(/\\>/g, ">")
-          .replace(/\\\?/g, "?")
-          .replace(/\\@/g, "@")
-          .replace(/\\\[/g, "[")
-          .replace(/\\\\/g, "\\")
-          .replace(/\\\]/g, "]")
-          .replace(/\\\^/g, "^")
-          .replace(/\\_/g, "_")
-          .replace(/\\`/g, "`")
-          .replace(/\\\{/g, "{")
-          .replace(/\\\|/g, "|")
-          .replace(/\\\}/g, "}")
-          .replace(/\\~/g, "~");
+        // Process backslash escapes only if NOT inside a Link (autolinks preserve backslashes)
+        if (!isInsideLink) {
+          content = content
+            .replace(/\\!/g, "!")
+            .replace(/\\"/g, '"')
+            .replace(/\\#/g, "#")
+            .replace(/\\\$/g, "$")
+            .replace(/\\%/g, "%")
+            .replace(/\\&/g, "&")
+            .replace(/\\'/g, "'")
+            .replace(/\\\(/g, "(")
+            .replace(/\\\)/g, ")")
+            .replace(/\\\*/g, "*")
+            .replace(/\\\+/g, "+")
+            .replace(/\\,/g, ",")
+            .replace(/\\-/g, "-")
+            .replace(/\\\./g, ".")
+            .replace(/\\\//g, "/")
+            .replace(/\\:/g, ":")
+            .replace(/\\;/g, ";")
+            .replace(/\\</g, "<")
+            .replace(/\\=/g, "=")
+            .replace(/\\>/g, ">")
+            .replace(/\\\?/g, "?")
+            .replace(/\\@/g, "@")
+            .replace(/\\\[/g, "[")
+            .replace(/\\\\/g, "\\")
+            .replace(/\\\]/g, "]")
+            .replace(/\\\^/g, "^")
+            .replace(/\\_/g, "_")
+            .replace(/\\`/g, "`")
+            .replace(/\\\{/g, "{")
+            .replace(/\\\|/g, "|")
+            .replace(/\\\}/g, "}")
+            .replace(/\\~/g, "~");
+        }
 
-        // Process HTML entities (basic common ones)
+        // Process HTML entities
         content = content
+          // Numeric character references (decimal)
+          .replace(/&#(\d+);/g, (match, num) => {
+            const code = parseInt(num, 10);
+            return code === 0 ? "�" : String.fromCharCode(code);
+          })
+          // Numeric character references (hexadecimal)
+          .replace(/&#[xX]([0-9a-fA-F]+);/g, (match, hex) => {
+            const code = parseInt(hex, 16);
+            return code === 0 ? "�" : String.fromCharCode(code);
+          })
+          // Named entities (basic common ones)
           .replace(/&nbsp;/g, " ")
           .replace(/&amp;/g, "&")
           .replace(/&lt;/g, "<")
@@ -203,9 +247,9 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
         children: [],
       };
 
-      const parent = stack[stack.length - 1];
+      const parent = stack[stack.length - 1].node;
       parent.children.push(normalized);
-      stack.push(normalized);
+      stack.push({ node: normalized, type: node.type.name });
     },
     leave(node: { type: { name: string } }) {
       if (node.type.name !== "Root" && node.type.name !== "⚠") {
@@ -236,9 +280,19 @@ function compareNodes(
     );
   }
 
-  // Content comparison - normalize whitespace
-  const lezerContent = lezerNode.content.trim();
-  const mdastContent = mdastNode.content.trim();
+  // Content comparison - normalize whitespace and tabs
+  const normalizeContent = (content: string) => {
+    return content
+      .trim()
+      // Convert tabs to 4 spaces for comparison (CommonMark tab expansion)
+      .replace(/\t/g, "    ")
+      // Normalize line endings
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n");
+  };
+
+  const lezerContent = normalizeContent(lezerNode.content);
+  const mdastContent = normalizeContent(mdastNode.content);
   if (lezerContent !== mdastContent) {
     issues.push(
       `${path}: content mismatch - lezer: "${lezerContent}", mdast: "${mdastContent}"`,
