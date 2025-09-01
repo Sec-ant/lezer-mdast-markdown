@@ -374,6 +374,31 @@ export function synthesizeStructuralEvents(
             value: "",
           });
           lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
+        } else {
+          // Check if this paragraph contains inline elements
+          const hasInlineElements = events.some(e => 
+            e.start >= ev.start && e.end <= ev.end &&
+            (e.tokenType === "emphasis" || e.tokenType === "strong" || 
+             e.tokenType === "codeText" || e.tokenType === "link" || 
+             e.tokenType === "image" || e.tokenType === "autolink")
+          );
+          
+          if (!hasInlineElements) {
+            // Generate paragraphText token only for plain text paragraphs
+            const paragraphContent = text.slice(ev.start, ev.end).trim();
+            if (paragraphContent.length > 0) {
+              out.push({
+                type: "exit",
+                tokenType: "paragraphText",
+                start: ev.start,
+                end: ev.end,
+                value: paragraphContent,
+              });
+              lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
+            }
+          }
+          // For paragraphs with inline elements, the individual inline tokens will be generated
+          // and the Text tokens for plain text segments will be handled by the data handler
         }
         
         currentParagraph = null;
@@ -715,38 +740,49 @@ export function synthesizeStructuralEvents(
       lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
       continue;
     }
-    // Handle text data - generate textContent tokens for plain text within paragraphs
+    // Handle text data - generate textContent tokens for plain text within paragraphs that have inline elements
     if (tt === "data" && ev.type === "exit") {
-      // Only generate textContent if we're inside a paragraph but NOT inside an inline element
+      // Only generate textContent if we're inside a paragraph that contains inline elements
       if (currentParagraph) {
-        // Check if this data is inside any inline element by looking at the event stack
-        const isInsideInline = events.some((checkEvent, idx) => {
-          const currentIdx = events.indexOf(ev);
-          return checkEvent.type === "enter" && 
-                 (checkEvent.tokenType === "emphasis" || checkEvent.tokenType === "strong" ||
-                  checkEvent.tokenType === "codeText" || checkEvent.tokenType === "link" ||
-                  checkEvent.tokenType === "image" || checkEvent.tokenType === "autolink") &&
-                 idx < currentIdx &&
-                 checkEvent.start <= ev.start &&
-                 checkEvent.end >= ev.end &&
-                 !events.slice(idx + 1, currentIdx).some(exitEvent => 
-                   exitEvent.type === "exit" && exitEvent.tokenType === checkEvent.tokenType
-                 );
-        });
+        // Check if this paragraph contains inline elements
+        const paragraphHasInlineElements = events.some(e => 
+          e.start >= currentParagraph!.start && e.end <= currentParagraph!.end &&
+          (e.tokenType === "emphasis" || e.tokenType === "strong" || 
+           e.tokenType === "codeText" || e.tokenType === "link" || 
+           e.tokenType === "image" || e.tokenType === "autolink")
+        );
         
-        if (!isInsideInline) {
-          const textValue = ev.value || text.slice(ev.start, ev.end);
-          if (textValue.trim().length > 0) {
-            out.push({
-              type: "exit",
-              tokenType: "textContent",
-              start: ev.start,
-              end: ev.end,
-              value: textValue,
-            });
-            lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
+        if (paragraphHasInlineElements) {
+          // Check if this data is inside any inline element by looking at the event stack
+          const isInsideInline = events.some((checkEvent, idx) => {
+            const currentIdx = events.indexOf(ev);
+            return checkEvent.type === "enter" && 
+                   (checkEvent.tokenType === "emphasis" || checkEvent.tokenType === "strong" ||
+                    checkEvent.tokenType === "codeText" || checkEvent.tokenType === "link" ||
+                    checkEvent.tokenType === "image" || checkEvent.tokenType === "autolink") &&
+                   idx < currentIdx &&
+                   checkEvent.start <= ev.start &&
+                   checkEvent.end >= ev.end &&
+                   !events.slice(idx + 1, currentIdx).some(exitEvent => 
+                     exitEvent.type === "exit" && exitEvent.tokenType === checkEvent.tokenType
+                   );
+          });
+          
+          if (!isInsideInline) {
+            const textValue = ev.value || text.slice(ev.start, ev.end);
+            if (textValue.trim().length > 0) {
+              out.push({
+                type: "exit",
+                tokenType: "textContent",
+                start: ev.start,
+                end: ev.end,
+                value: textValue,
+              });
+              lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
+            }
           }
         }
+        // For paragraphs without inline elements, let paragraphText handle everything
       }
       continue;
     }

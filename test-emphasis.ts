@@ -1,28 +1,13 @@
-// Test emphasis and strong emphasis
-import { fromMarkdown } from "mdast-util-from-markdown";
+// Test just emphasis
 import { parser } from "./dist/es/index.js";
 
-const tests = [
-  "*emphasis*",
-  "**strong**", 
-  "***both***",
-  "`code`",
-  "[link](url)",
-  "![image](url)"
-];
+const tests = ["*emphasis*", "foo*bar*"];
 
 for (const markdown of tests) {
-  console.log(`\n=== Testing: ${markdown} ===`);
-  
-  // MDAST
-  const mdast = fromMarkdown(markdown);
-  console.log("MDAST:");
-  console.log(JSON.stringify(mdast, null, 2));
-  
-  // Lezer
+  console.log(`\nTesting: ${markdown}`);
   const lezerTree = parser.parse(markdown);
-  console.log("\nLezer tree:", lezerTree.toString());
-  
+  console.log("Lezer tree:", lezerTree.toString());
+
   const cursor = lezerTree.cursor();
   function printCursor(cursor: any, depth = 0) {
     const indent = "  ".repeat(depth);
