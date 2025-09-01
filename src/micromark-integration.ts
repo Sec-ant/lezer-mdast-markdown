@@ -99,10 +99,6 @@ function generateParagraphPhrasingTokens(
   text: string,
   out: ParseEvent[],
 ): void {
-  console.log(
-    `DEBUG: generateParagraphPhrasingTokens called for [${paragraph.start}, ${paragraph.end}] content: "${text.slice(paragraph.start, paragraph.end)}"`,
-  );
-
   // Find all inline elements within this paragraph
   const inlineEvents = allEvents
     .filter(
@@ -120,11 +116,6 @@ function generateParagraphPhrasingTokens(
     )
     .sort((a, b) => a.start - b.start);
 
-  console.log(
-    `DEBUG: Found ${inlineEvents.length} inline events:`,
-    inlineEvents.map((e) => `${e.tokenType}[${e.start},${e.end}]`),
-  );
-
   // Check if paragraph has any valid inline elements
   const hasValidInlines = inlineEvents.length > 0;
 
@@ -132,9 +123,6 @@ function generateParagraphPhrasingTokens(
     // Simple paragraph - just generate paragraphText token for the entire content
     const paragraphContent = text.slice(paragraph.start, paragraph.end).trim();
     if (paragraphContent.length > 0) {
-      console.log(
-        `DEBUG: Generating simple paragraphText token [${paragraph.start}, ${paragraph.end}] "${paragraphContent}"`,
-      );
       out.push({
         type: "exit",
         tokenType: "paragraphText",
@@ -146,10 +134,6 @@ function generateParagraphPhrasingTokens(
     return;
   }
 
-  console.log(
-    `DEBUG: Processing complex paragraph with ${inlineEvents.length} inline events`,
-  );
-
   // Complex paragraph with inline elements - generate phrasing tokens
   let currentPos = paragraph.start;
 
@@ -158,9 +142,6 @@ function generateParagraphPhrasingTokens(
     if (currentPos < inlineEvent.start) {
       const textContent = text.slice(currentPos, inlineEvent.start);
       if (textContent.trim().length > 0) {
-        console.log(
-          `DEBUG: Generating textContent token [${currentPos}, ${inlineEvent.start}] "${textContent}"`,
-        );
         out.push({
           type: "exit",
           tokenType: "textContent",
@@ -172,9 +153,6 @@ function generateParagraphPhrasingTokens(
     }
 
     // Generate tokens for the inline element itself
-    console.log(
-      `DEBUG: Generating inline tokens for ${inlineEvent.tokenType} [${inlineEvent.start}, ${inlineEvent.end}]`,
-    );
     generateInlineElementTokens(inlineEvent, text, out);
 
     currentPos = inlineEvent.end;
@@ -184,9 +162,6 @@ function generateParagraphPhrasingTokens(
   if (currentPos < paragraph.end) {
     const remainingText = text.slice(currentPos, paragraph.end);
     if (remainingText.trim().length > 0) {
-      console.log(
-        `DEBUG: Generating remaining textContent token [${currentPos}, ${paragraph.end}] "${remainingText}"`,
-      );
       out.push({
         type: "exit",
         tokenType: "textContent",
@@ -210,9 +185,6 @@ function generateInlineElementTokens(
 
   if (tt === "emphasis") {
     // Generate emphasis open, content, close tokens
-    console.log(
-      `DEBUG: Generating emphasis tokens - open [${event.start}, ${event.start + 1}], content [${event.start + 1}, ${event.end - 1}], close [${event.end - 1}, ${event.end}]`,
-    );
     out.push({
       type: "exit",
       tokenType: "emphasisOpen",
@@ -676,9 +648,6 @@ export function synthesizeStructuralEvents(
             lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
           } else {
             // NEW APPROACH: Generate proper phrasing tokens for the entire paragraph
-            console.log(
-              `DEBUG: Processing paragraph [${currentParagraph.start}, ${currentParagraph.end}] content: "${text.slice(currentParagraph.start, currentParagraph.end)}"`,
-            );
             generateParagraphPhrasingTokens(
               currentParagraph,
               events,
