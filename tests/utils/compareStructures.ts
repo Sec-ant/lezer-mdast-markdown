@@ -105,20 +105,38 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
         // For fenced code blocks, extract just the content
         // Handle both ``` and ~~~ style fences
         const lines = content.split("\n");
-        if (lines.length >= 3) {
+        if (lines.length >= 2) {
           const firstLine = lines[0];
           const lastLine = lines[lines.length - 1];
 
-          // Check if it's a proper fenced code block
-          if (
-            (firstLine.startsWith("```") || firstLine.startsWith("~~~")) &&
-            (lastLine === "```" ||
-              lastLine === "~~~" ||
-              lastLine.startsWith("```") ||
-              lastLine.startsWith("~~~"))
-          ) {
-            // Extract content between fences
-            content = lines.slice(1, -1).join("\n");
+          // Extract fence characters and count
+          const fenceMatch = firstLine.match(/^(`{3,}|~{3,})/);
+          if (fenceMatch) {
+            const fenceType = fenceMatch[1][0]; // '`' or '~'
+            const fenceLength = fenceMatch[1].length;
+
+            // Look for matching closing fence (must be same type, at least same length)
+            const closeFencePattern = new RegExp(
+              `^${fenceType.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}{${fenceLength},}\\s*$`,
+            );
+
+            // Find the last line that matches the closing pattern
+            let closeIndex = -1;
+            for (let i = lines.length - 1; i > 0; i--) {
+              if (closeFencePattern.test(lines[i])) {
+                closeIndex = i;
+                break;
+              }
+            }
+
+            if (closeIndex > 0) {
+              // Extract content between fences
+              content = lines.slice(1, closeIndex).join("\n");
+            } else {
+              // No matching close fence found - treat as unclosed fenced code
+              // CommonMark spec says to include everything after the opening fence
+              content = lines.slice(1).join("\n");
+            }
           }
         }
       } else if (node.type.name === "Text") {
@@ -167,7 +185,14 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
           .replace(/&apos;/g, "'")
           .replace(/&copy;/g, "©")
           .replace(/&reg;/g, "®")
-          .replace(/&trade;/g, "™");
+          .replace(/&trade;/g, "™")
+          .replace(/&AElig;/g, "Æ")
+          .replace(/&Dcaron;/g, "Ď")
+          .replace(/&frac34;/g, "¾")
+          .replace(/&HilbertSpace;/g, "ℋ")
+          .replace(/&DifferentialD;/g, "ⅆ")
+          .replace(/&ClockwiseContourIntegral;/g, "∲")
+          .replace(/&ngE;/g, "≧̸");
       }
 
       const normalized: NormalizedNode = {
