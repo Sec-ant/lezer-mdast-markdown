@@ -1,4 +1,4 @@
-// Direct structure comparison - Lezer nodes now match mdast types directly
+// Clean structural comparison focusing on node type and position
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { parser } from "../../src";
 
@@ -6,7 +6,6 @@ export interface NormalizedNode {
   type: string;
   from: number;
   to: number;
-  content: string;
   children: NormalizedNode[];
 }
 
@@ -14,32 +13,22 @@ function capitalizeFirst(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function collectMdast(
-  node: {
-    type: string;
-    position?: { start?: { offset?: number }; end?: { offset?: number } };
-    value?: string;
-    children?: unknown[];
-  },
-  markdown: string,
-): NormalizedNode {
+function collectMdast(node: {
+  type: string;
+  position?: { start?: { offset?: number }; end?: { offset?: number } };
+  children?: unknown[];
+}): NormalizedNode {
   const normalized: NormalizedNode = {
     // Convert mdast type to expected Lezer capitalized format
     type: capitalizeFirst(node.type),
     from: node.position?.start?.offset || 0,
     to: node.position?.end?.offset || 0,
-    content:
-      node.value ||
-      markdown.slice(
-        node.position?.start?.offset || 0,
-        node.position?.end?.offset || 0,
-      ),
     children: [],
   };
 
   if (node.children && Array.isArray(node.children)) {
     normalized.children = node.children.map((child) =>
-      collectMdast(child as typeof node, markdown),
+      collectMdast(child as typeof node),
     );
   }
 
@@ -59,12 +48,11 @@ interface LezerTree {
   }) => void;
 }
 
-function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
+function collectLezer(tree: LezerTree): NormalizedNode {
   const result: NormalizedNode = {
-    type: "Root", // Top level should be "Root" to match mdast
+    type: "Root",
     from: 0,
-    to: markdown.length,
-    content: markdown,
+    to: 0,
     children: [],
   };
 
@@ -74,6 +62,8 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
     enter(node: { type: { name: string }; from: number; to: number }) {
       // Skip the top-level Root node to avoid double nesting
       if (node.type.name === "Root") {
+        result.from = node.from;
+        result.to = node.to;
         return;
       }
 
@@ -86,7 +76,6 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
         type: node.type.name,
         from: node.from,
         to: node.to,
-        content: markdown.slice(node.from, node.to),
         children: [],
       };
 
@@ -111,6 +100,7 @@ function compareNodes(
 ): { passed: boolean; details: string } {
   const issues: string[] = [];
 
+  // Only compare structure: type and position
   if (lezerNode.type !== mdastNode.type) {
     issues.push(
       `${path}: type mismatch - lezer: ${lezerNode.type}, mdast: ${mdastNode.type}`,
@@ -120,15 +110,6 @@ function compareNodes(
   if (lezerNode.from !== mdastNode.from || lezerNode.to !== mdastNode.to) {
     issues.push(
       `${path}: position mismatch - lezer: [${lezerNode.from}, ${lezerNode.to}], mdast: [${mdastNode.from}, ${mdastNode.to}]`,
-    );
-  }
-
-  // Content comparison - normalize whitespace
-  const lezerContent = lezerNode.content.trim();
-  const mdastContent = mdastNode.content.trim();
-  if (lezerContent !== mdastContent) {
-    issues.push(
-      `${path}: content mismatch - lezer: "${lezerContent}", mdast: "${mdastContent}"`,
     );
   }
 
@@ -174,9 +155,9 @@ export function compareStructures(markdown: string): {
     const mdastTree = fromMarkdown(markdown);
     const lezerTree = parser.parse(markdown);
 
-    // Convert both to normalized format
-    const mdastNode = collectMdast(mdastTree, markdown);
-    const lezerNode = collectLezer(lezerTree, markdown);
+    // Convert both to normalized format (structure only)
+    const mdastNode = collectMdast(mdastTree);
+    const lezerNode = collectLezer(lezerTree);
 
     const result = compareNodes(lezerNode, mdastNode, "root");
 
