@@ -202,16 +202,36 @@ function mapToLezerToken(tokenType: string): number | null {
       return terms.paragraphText;
     case "textContent":
       return terms.textContent;
-    case "emphasis":
-      return terms.emphasis;
-    case "strong":
-      return terms.strong;
-    case "inlineCode":
-      return terms.inlineCode;
-    case "link":
-      return terms.link;
-    case "image":
-      return terms.image;
+    case "emphasisOpen":
+      return terms.emphasisOpen;
+    case "emphasisText":
+      return terms.emphasisText;
+    case "emphasisClose":
+      return terms.emphasisClose;
+    case "strongOpen":
+      return terms.strongOpen;
+    case "strongText":
+      return terms.strongText;
+    case "strongClose":
+      return terms.strongClose;
+    case "inlineCodeOpen":
+      return terms.inlineCodeOpen;
+    case "inlineCodeText":
+      return terms.inlineCodeText;
+    case "inlineCodeClose":
+      return terms.inlineCodeClose;
+    case "linkOpen":
+      return terms.linkOpen;
+    case "linkText":
+      return terms.linkText;
+    case "linkClose":
+      return terms.linkClose;
+    case "imageOpen":
+      return terms.imageOpen;
+    case "imageText":
+      return terms.imageText;
+    case "imageClose":
+      return terms.imageClose;
     case "characterEscape":
       return terms.characterEscape;
     case "thematicBreak":

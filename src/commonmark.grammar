@@ -32,20 +32,26 @@ Html { htmlContent }
 Paragraph { phrasing }  
 ThematicBreak { thematicBreak }
 
-// Inline content (phrasing)
+// Inline content (phrasing) - hierarchical structure
 phrasing {
   Text { 
     headingText |
     paragraphText |
     textContent
   } |
-  Emphasis { emphasis } |
-  Strong { strong } |
-  InlineCode { inlineCode } |
-  Link { link } |
-  Image { image } |
+  Emphasis { emphasisOpen emphasisContent emphasisClose } |
+  Strong { strongOpen strongContent strongClose } |
+  InlineCode { inlineCodeOpen Text { inlineCodeText } inlineCodeClose } |
+  Link { linkOpen linkContent linkClose } |
+  Image { imageOpen imageContent imageClose } |
   CharacterEscape { characterEscape }
 }
+
+// Inline content for hierarchical elements
+emphasisContent { Text { emphasisText } }
+strongContent { Text { strongText } }
+linkContent { Text { linkText } }
+imageContent { Text { imageText } }
 
 @external tokens micromarkTokenizer from "./micromark-tokenizer" {
   headingMarkers,
@@ -67,11 +73,21 @@ phrasing {
   htmlContent,
   paragraphText,
   textContent,
-  emphasis,
-  strong,
-  inlineCode,
-  link,
-  image,
+  emphasisOpen,
+  emphasisText,
+  emphasisClose,
+  strongOpen,
+  strongText,
+  strongClose,
+  inlineCodeOpen,
+  inlineCodeText,
+  inlineCodeClose,
+  linkOpen,
+  linkText,
+  linkClose,
+  imageOpen,
+  imageText,
+  imageClose,
   characterEscape,
   thematicBreak,
   whitespace

@@ -88,74 +88,11 @@ export function synthesizeStructuralEvents(
     langIndex?: number;
   }
   let fence: FenceState | null = null;
-  let paragraphStart: number | null = null;
   let lastEmittedEnd = 0;
   let codeTextData: string[] = [];
 
-  function flushParagraph(endPos: number) {
-    if (paragraphStart === null) return;
-
-    const startPos = paragraphStart;
-    const raw = text.slice(startPos, endPos).replace(/\n+$/, "");
-    if (raw.trim().length > 0) {
-      // Check if this paragraph is in a list or blockquote - if so, don't flush it as regular paragraph
-      const isInList = events.some(
-        (e) =>
-          (e.tokenType === "listOrdered" || e.tokenType === "listUnordered") &&
-          e.type === "enter" &&
-          e.start <= startPos &&
-          e.end >= endPos,
-      );
-
-      const isInBlockquote = events.some(
-        (e) =>
-          e.tokenType === "blockQuote" &&
-          e.type === "enter" &&
-          e.start <= startPos &&
-          e.end >= endPos,
-      );
-
-      if (!isInList && !isInBlockquote) {
-        // Remove blockquote markers from paragraph content
-        let cleanedContent = raw;
-
-        // Check if this paragraph might be inside a blockquote
-        // by looking for blockquote prefixes in the content
-        if (raw.includes("\n>")) {
-          // Split into lines and remove blockquote markers
-          const lines = raw.split("\n");
-          const cleanedLines = lines.map((line) => {
-            // Remove blockquote prefix "> " or ">" from the beginning of each line
-            if (line.match(/^>\s?/)) {
-              return line.replace(/^>\s?/, "");
-            }
-            return line;
-          });
-          cleanedContent = cleanedLines.join("\n");
-        }
-
-        // Find the actual start and end positions for the cleaned content
-        const paraStart = startPos + (raw.match(/^\s*/)?.[0].length || 0);
-
-        // For the end position, we need to account for the cleaned content
-        // but still use the original positions for token boundaries
-        const paraEnd = startPos + raw.length;
-
-        if (paraEnd > paraStart && cleanedContent.trim().length > 0) {
-          // Generate paragraphText token for paragraph content
-          out.push({
-            type: "exit",
-            tokenType: "paragraphText",
-            start: paraStart,
-            end: paraEnd,
-            value: cleanedContent,
-          });
-          lastEmittedEnd = Math.max(lastEmittedEnd, paraEnd);
-        }
-      }
-    }
-    paragraphStart = null;
-  }
+  // Track paragraphs and their content to handle mixed content properly
+  let currentParagraph: { start: number; end: number } | null = null;
 
   function flushFenceClose(closePos: number) {
     if (!fence) return;
@@ -191,7 +128,6 @@ export function synthesizeStructuralEvents(
 
     if (tt === "blockQuote") {
       if (ev.type === "enter") {
-        flushParagraph(ev.start);
         // Generate single blockQuoteMarker token for the entire blockquote
         out.push({
           type: "exit",
@@ -390,7 +326,6 @@ export function synthesizeStructuralEvents(
         lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 1);
       } else {
         // Generate listClose token at the end
-        flushParagraph(ev.end);
         out.push({
           type: "exit",
           tokenType: "listClose",
@@ -417,7 +352,7 @@ export function synthesizeStructuralEvents(
     }
     if (tt === "paragraph") {
       if (ev.type === "enter") {
-        paragraphStart = ev.start;
+        currentParagraph = { start: ev.start, end: ev.end };
       } else if (ev.type === "exit") {
         // Check if this paragraph is inside a list
         const isInList = events.some(
@@ -429,29 +364,7 @@ export function synthesizeStructuralEvents(
             e.end >= ev.end,
         );
 
-        // Check if this paragraph is inside a blockquote
-        const isInBlockquote = events.some(
-          (e) =>
-            e.tokenType === "blockQuote" &&
-            e.type === "enter" &&
-            e.start <= ev.start &&
-            e.end >= ev.end,
-        );
-
-        if (isInList && !isInBlockquote) {
-          // Generate list item text token only - no duplicate paragraph token
-          const raw = text.slice(ev.start, ev.end).replace(/\n+$/, "");
-          if (raw.trim().length > 0) {
-            out.push({
-              type: "exit",
-              tokenType: "listItemText",
-              start: ev.start,
-              end: ev.end,
-              value: raw,
-            });
-            lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
-          }
-
+        if (isInList) {
           // Generate listItemClose after the content
           out.push({
             type: "exit",
@@ -461,40 +374,9 @@ export function synthesizeStructuralEvents(
             value: "",
           });
           lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
-        } else if (isInBlockquote && !isInList) {
-          // Generate blockquote-specific paragraph token only - no duplicate paragraph token
-          const raw = text.slice(ev.start, ev.end).replace(/\n+$/, "");
-          if (raw.trim().length > 0) {
-            // Clean the paragraph content by removing blockquote markers
-            const lines = raw.split("\n");
-            const cleanedLines = lines.map((line) => {
-              // Remove blockquote prefix "> " or ">" from the beginning of each line
-              // Be more careful about whitespace
-              if (line.startsWith("> ")) {
-                return line.slice(2);
-              } else if (line.startsWith(">")) {
-                return line.slice(1);
-              } else {
-                return line;
-              }
-            });
-            const cleanedContent = cleanedLines.join("\n");
-
-            if (cleanedContent.trim().length > 0) {
-              out.push({
-                type: "exit",
-                tokenType: "blockQuoteParagraphText",
-                start: ev.start,
-                end: ev.end,
-                value: cleanedContent,
-              });
-              lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
-            }
-          }
-        } else {
-          // Regular paragraph processing
-          flushParagraph(ev.end);
         }
+        
+        currentParagraph = null;
       }
       continue;
     }
@@ -584,29 +466,91 @@ export function synthesizeStructuralEvents(
     if (tt === "codeFencedValue" && ev.type === "exit") {
       if (fence) fence.content.push({ start: ev.start, end: ev.end });
     }
-    // Handle inline elements
-    if (tt === "emphasis" && ev.type === "exit") {
+    // Handle inline elements with hierarchical structure
+    if (tt === "emphasis" && ev.type === "enter") {
+      // Generate emphasis opening token
       out.push({
         type: "exit",
-        tokenType: "emphasis",
+        tokenType: "emphasisOpen",
         start: ev.start,
-        end: ev.end,
-        value: text.slice(ev.start, ev.end),
+        end: ev.start + 1, // "*" or "_"
+        value: text.slice(ev.start, ev.start + 1),
       });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 1);
+      continue;
+    }
+    if (tt === "emphasis" && ev.type === "exit") {
+      // Generate emphasis text content and closing token
+      const emphasisContent = text.slice(ev.start + 1, ev.end - 1); // Remove markers
+      if (emphasisContent.length > 0) {
+        out.push({
+          type: "exit",
+          tokenType: "emphasisText",
+          start: ev.start + 1,
+          end: ev.end - 1,
+          value: emphasisContent,
+        });
+        lastEmittedEnd = Math.max(lastEmittedEnd, ev.end - 1);
+      }
+      // Generate emphasis closing token
+      out.push({
+        type: "exit",
+        tokenType: "emphasisClose",
+        start: ev.end - 1,
+        end: ev.end,
+        value: text.slice(ev.end - 1, ev.end),
+      });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
+      continue;
+    }
+    if (tt === "strong" && ev.type === "enter") {
+      // Generate strong opening token
+      out.push({
+        type: "exit",
+        tokenType: "strongOpen",
+        start: ev.start,
+        end: ev.start + 2, // "**" or "__"
+        value: text.slice(ev.start, ev.start + 2),
+      });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 2);
       continue;
     }
     if (tt === "strong" && ev.type === "exit") {
+      // Generate strong text content and closing token
+      const strongContent = text.slice(ev.start + 2, ev.end - 2); // Remove markers
+      if (strongContent.length > 0) {
+        out.push({
+          type: "exit",
+          tokenType: "strongText",
+          start: ev.start + 2,
+          end: ev.end - 2,
+          value: strongContent,
+        });
+        lastEmittedEnd = Math.max(lastEmittedEnd, ev.end - 2);
+      }
+      // Generate strong closing token
       out.push({
         type: "exit",
-        tokenType: "strong",
-        start: ev.start,
+        tokenType: "strongClose",
+        start: ev.end - 2,
         end: ev.end,
-        value: text.slice(ev.start, ev.end),
+        value: text.slice(ev.end - 2, ev.end),
       });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
       continue;
     }
     if (tt === "codeText" && ev.type === "enter") {
       codeTextData = []; // Reset for new code span
+      // Generate opening token for inline code
+      const openMarker = text.slice(ev.start, ev.start + 1); // "`"
+      out.push({
+        type: "exit",
+        tokenType: "inlineCodeOpen",
+        start: ev.start,
+        end: ev.start + 1,
+        value: openMarker,
+      });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 1);
       continue;
     }
     if (tt === "codeTextData" && ev.type === "exit") {
@@ -614,46 +558,137 @@ export function synthesizeStructuralEvents(
       continue;
     }
     if (tt === "codeText" && ev.type === "exit") {
-      // Use collected codeTextData instead of full content
+      // Generate text content for the inline code
       const content = codeTextData.join("");
+      if (content.length > 0) {
+        out.push({
+          type: "exit",
+          tokenType: "inlineCodeText",
+          start: ev.start + 1, // After opening backtick
+          end: ev.end - 1, // Before closing backtick
+          value: content,
+        });
+        lastEmittedEnd = Math.max(lastEmittedEnd, ev.end - 1);
+      }
+      // Generate closing token
       out.push({
         type: "exit",
-        tokenType: "inlineCode",
-        start: ev.start,
+        tokenType: "inlineCodeClose",
+        start: ev.end - 1,
         end: ev.end,
-        value: content,
+        value: "`",
       });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
       codeTextData = []; // Clear after use
       continue;
     }
-    if (tt === "link" && ev.type === "exit") {
+    if (tt === "link" && ev.type === "enter") {
+      // Generate link opening token  
       out.push({
         type: "exit",
-        tokenType: "link",
+        tokenType: "linkOpen",
         start: ev.start,
-        end: ev.end,
-        value: text.slice(ev.start, ev.end),
+        end: ev.start + 1, // "["
+        value: "[",
       });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 1);
+      continue;
+    }
+    if (tt === "link" && ev.type === "exit") {
+      // For links, we need to extract the text content between [ and ]
+      const fullLinkText = text.slice(ev.start, ev.end);
+      const linkTextMatch = fullLinkText.match(/^\[([^\]]*)\]/);
+      if (linkTextMatch) {
+        const linkText = linkTextMatch[1];
+        if (linkText.length > 0) {
+          out.push({
+            type: "exit",
+            tokenType: "linkText",
+            start: ev.start + 1, // After "["
+            end: ev.start + 1 + linkText.length,
+            value: linkText,
+          });
+          lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 1 + linkText.length);
+        }
+      }
+      // Generate link closing token
+      out.push({
+        type: "exit",
+        tokenType: "linkClose",
+        start: ev.end - 1,
+        end: ev.end,
+        value: text.slice(ev.end - 1, ev.end),
+      });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
       continue;
     }
     if (tt === "autolink" && ev.type === "exit") {
+      // Autolinks should also be hierarchical
+      const content = text.slice(ev.start + 1, ev.end - 1); // Remove < >
       out.push({
         type: "exit",
-        tokenType: "link",
+        tokenType: "linkOpen",
         start: ev.start,
-        end: ev.end,
-        value: text.slice(ev.start, ev.end),
+        end: ev.start + 1,
+        value: "<",
       });
+      if (content.length > 0) {
+        out.push({
+          type: "exit",
+          tokenType: "linkText",
+          start: ev.start + 1,
+          end: ev.end - 1,
+          value: content,
+        });
+      }
+      out.push({
+        type: "exit",
+        tokenType: "linkClose",
+        start: ev.end - 1,
+        end: ev.end,
+        value: ">",
+      });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
+      continue;
+    }
+    if (tt === "image" && ev.type === "enter") {
+      // Generate image opening token
+      out.push({
+        type: "exit",
+        tokenType: "imageOpen",
+        start: ev.start,
+        end: ev.start + 2, // "!["
+        value: "![",
+      });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 2);
       continue;
     }
     if (tt === "image" && ev.type === "exit") {
+      // Extract image alt text
+      const fullImageText = text.slice(ev.start, ev.end);
+      const imageTextMatch = fullImageText.match(/^!\[([^\]]*)\]/);
+      if (imageTextMatch) {
+        const imageText = imageTextMatch[1];
+        if (imageText.length > 0) {
+          out.push({
+            type: "exit",
+            tokenType: "imageText",
+            start: ev.start + 2, // After "!["
+            end: ev.start + 2 + imageText.length,
+            value: imageText,
+          });
+          lastEmittedEnd = Math.max(lastEmittedEnd, ev.start + 2 + imageText.length);
+        }
+      }
+      // Generate image closing token
       out.push({
         type: "exit",
-        tokenType: "image",
-        start: ev.start,
+        tokenType: "imageClose",
+        start: ev.end - 1,
         end: ev.end,
-        value: text.slice(ev.start, ev.end),
+        value: text.slice(ev.end - 1, ev.end),
       });
+      lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
       continue;
     }
     if (tt === "characterEscape" && ev.type === "exit") {
@@ -667,7 +702,6 @@ export function synthesizeStructuralEvents(
       continue;
     }
     if (tt === "htmlFlow" && ev.type === "enter") {
-      flushParagraph(ev.start);
       continue;
     }
     if (tt === "htmlFlow" && ev.type === "exit") {
@@ -681,8 +715,40 @@ export function synthesizeStructuralEvents(
       lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
       continue;
     }
-    // Handle text data
+    // Handle text data - generate textContent tokens for plain text within paragraphs
     if (tt === "data" && ev.type === "exit") {
+      // Only generate textContent if we're inside a paragraph but NOT inside an inline element
+      if (currentParagraph) {
+        // Check if this data is inside any inline element by looking at the event stack
+        const isInsideInline = events.some((checkEvent, idx) => {
+          const currentIdx = events.indexOf(ev);
+          return checkEvent.type === "enter" && 
+                 (checkEvent.tokenType === "emphasis" || checkEvent.tokenType === "strong" ||
+                  checkEvent.tokenType === "codeText" || checkEvent.tokenType === "link" ||
+                  checkEvent.tokenType === "image" || checkEvent.tokenType === "autolink") &&
+                 idx < currentIdx &&
+                 checkEvent.start <= ev.start &&
+                 checkEvent.end >= ev.end &&
+                 !events.slice(idx + 1, currentIdx).some(exitEvent => 
+                   exitEvent.type === "exit" && exitEvent.tokenType === checkEvent.tokenType
+                 );
+        });
+        
+        if (!isInsideInline) {
+          const textValue = ev.value || text.slice(ev.start, ev.end);
+          if (textValue.trim().length > 0) {
+            out.push({
+              type: "exit",
+              tokenType: "textContent",
+              start: ev.start,
+              end: ev.end,
+              value: textValue,
+            });
+            lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
+          }
+        }
+      }
+      continue;
     }
   }
 
@@ -692,7 +758,7 @@ export function synthesizeStructuralEvents(
         ? fence.content[fence.content.length - 1].end
         : fence.openStart,
     );
-  if (paragraphStart !== null) flushParagraph(text.length);
+  
   return out.sort((a, b) => a.start - b.start || a.end - b.end);
 }
 
