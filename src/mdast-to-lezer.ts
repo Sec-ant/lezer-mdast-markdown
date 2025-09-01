@@ -42,9 +42,6 @@ const nodeTypes = [
 
 const nodeSet = new NodeSet(nodeTypes);
 
-// Store processed content for nodes that have it
-const contentMap = new Map<string, string>();
-
 /**
  * Convert Input to string
  */

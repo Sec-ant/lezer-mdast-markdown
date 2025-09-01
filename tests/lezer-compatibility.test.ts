@@ -3,14 +3,6 @@
  * Ensures generated trees work properly with Lezer/CodeMirror systems
  */
 
-import {
-  defaultHighlightStyle,
-  Language,
-  LanguageSupport,
-  LRLanguage,
-  syntaxHighlighting,
-} from "@codemirror/language";
-import { EditorState } from "@codemirror/state";
 import { Tree } from "@lezer/common";
 import { describe, expect, test } from "vitest";
 import { parser } from "../src";

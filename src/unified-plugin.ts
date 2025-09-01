@@ -5,8 +5,8 @@
  * using the unified plugin architecture as requested.
  */
 
-import { type NodeSet, type NodeType, Tree } from "@lezer/common";
-import type { Node, Parent } from "mdast";
+import type { NodeSet, NodeType } from "@lezer/common";
+import type { Node } from "mdast";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 
@@ -18,7 +18,7 @@ export interface MdastToLezerOptions {
 
 // Unified plugin for transforming mdast to Lezer-compatible format
 export const remarkLezer: Plugin<[MdastToLezerOptions?], Node, void> = (
-  options = {},
+  _options = {},
 ) => {
   return (tree, file) => {
     // Store the processed mdast tree for later Lezer tree construction
@@ -30,11 +30,12 @@ export const remarkLezer: Plugin<[MdastToLezerOptions?], Node, void> = (
       {
         type: string;
         content?: string;
+        // biome-ignore lint/suspicious/noExplicitAny: Position type from unified/mdast
         position?: any;
       }
     >();
 
-    visit(tree, (node, index, parent) => {
+    visit(tree, (node, _index, _parent) => {
       const key = `${node.position?.start?.offset}-${node.position?.end?.offset}`;
       nodeMap.set(key, {
         type: node.type,
@@ -55,7 +56,7 @@ export function createMdastToLezerTransformer(
     plugin: remarkLezer,
     options,
     // Additional helper methods could be added here
-    transformTree: (mdastTree: Node, originalText: string) => {
+    transformTree: (_mdastTree: Node, _originalText: string) => {
       // This could contain the actual tree transformation logic
       // For now, it's a placeholder that would be implemented based on our existing logic
       return null; // Would return a Lezer Tree
