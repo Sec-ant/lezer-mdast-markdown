@@ -82,11 +82,78 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
         return;
       }
 
+      // Extract content based on node type
+      let content = markdown.slice(node.from, node.to);
+
+      // For nodes that contain processed content, we need to re-process
+      if (node.type.name === "InlineCode") {
+        // Remove surrounding backticks and process content
+        const match = content.match(/^`(.+?)`$/s);
+        if (match) {
+          content = match[1];
+        }
+      } else if (node.type.name === "Code") {
+        // For fenced code blocks, extract just the content
+        // Handle both ``` and ~~~ style fences
+        const lines = content.split("\n");
+        if (lines.length >= 3) {
+          const firstLine = lines[0];
+          const lastLine = lines[lines.length - 1];
+
+          // Check if it's a proper fenced code block
+          if (
+            (firstLine.startsWith("```") || firstLine.startsWith("~~~")) &&
+            (lastLine === "```" ||
+              lastLine === "~~~" ||
+              lastLine.startsWith("```") ||
+              lastLine.startsWith("~~~"))
+          ) {
+            // Extract content between fences
+            content = lines.slice(1, -1).join("\n");
+          }
+        }
+      } else if (node.type.name === "Text") {
+        // Process backslash escapes
+        content = content
+          .replace(/\\!/g, "!")
+          .replace(/\\"/g, '"')
+          .replace(/\\#/g, "#")
+          .replace(/\\\$/g, "$")
+          .replace(/\\%/g, "%")
+          .replace(/\\&/g, "&")
+          .replace(/\\'/g, "'")
+          .replace(/\\\(/g, "(")
+          .replace(/\\\)/g, ")")
+          .replace(/\\\*/g, "*")
+          .replace(/\\\+/g, "+")
+          .replace(/\\,/g, ",")
+          .replace(/\\-/g, "-")
+          .replace(/\\\./g, ".")
+          .replace(/\\\//g, "/")
+          .replace(/\\:/g, ":")
+          .replace(/\\;/g, ";")
+          .replace(/\\</g, "<")
+          .replace(/\\=/g, "=")
+          .replace(/\\>/g, ">")
+          .replace(/\\\?/g, "?")
+          .replace(/\\@/g, "@")
+          .replace(/\\\[/g, "[")
+          .replace(/\\\\/g, "\\")
+          .replace(/\\\]/g, "]")
+          .replace(/\\\^/g, "^")
+          .replace(/\\_/g, "_")
+          .replace(/\\`/g, "`")
+          .replace(/\\\{/g, "{")
+          .replace(/\\\|/g, "|")
+          .replace(/\\\}/g, "}")
+          .replace(/\\~/g, "~");
+      }
+
       const normalized: NormalizedNode = {
         type: node.type.name,
         from: node.from,
         to: node.to,
-        content: markdown.slice(node.from, node.to),
+        content: content,
         children: [],
       };
 

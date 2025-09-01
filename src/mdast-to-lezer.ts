@@ -3,16 +3,16 @@
  * Complete rewrite using unified/unist/mdast ecosystem
  */
 import {
+  type Input,
   NodeSet,
   NodeType,
   Parser,
-  Tree,
-  type Input,
   type PartialParse,
+  Tree,
   type TreeFragment,
 } from "@lezer/common";
+import type { Node, Root } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
-import type { Root } from "mdast";
 
 // Define node types that match mdast exactly
 const nodeTypes = [
@@ -41,6 +41,9 @@ const nodeTypes = [
 ] as const;
 
 const nodeSet = new NodeSet(nodeTypes);
+
+// Store processed content for nodes that have it
+const contentMap = new Map<string, string>();
 
 /**
  * Convert Input to string
@@ -89,7 +92,7 @@ function getNodeTypeFromMdast(nodeType: string): NodeType {
 /**
  * Convert mdast node to Lezer Tree
  */
-function mdastToLezerTree(node: any, originalText: string): Tree {
+function mdastToLezerTree(node: Node, originalText: string): Tree {
   const nodeType = getNodeTypeFromMdast(node.type);
   const children: Tree[] = [];
   const positions: number[] = [];
@@ -97,30 +100,25 @@ function mdastToLezerTree(node: any, originalText: string): Tree {
   // Handle position - mdast uses position.start.offset and position.end.offset
   let from = 0;
   let to = originalText.length;
-  
+
   if (node.position) {
     from = node.position.start?.offset ?? 0;
     to = node.position.end?.offset ?? originalText.length;
   }
 
   // Process children if they exist
-  if (node.children) {
-    for (const child of node.children) {
+  if ("children" in node && Array.isArray(node.children)) {
+    for (const child of node.children as Node[]) {
       const childTree = mdastToLezerTree(child, originalText);
       children.push(childTree);
-      
+
       // Position relative to parent
       const childFrom = child.position?.start?.offset ?? from;
       positions.push(Math.max(0, childFrom - from));
     }
   }
 
-  return new Tree(
-    nodeType,
-    children,
-    positions,
-    Math.max(0, to - from)
-  );
+  return new Tree(nodeType, children, positions, Math.max(0, to - from));
 }
 
 /**
@@ -145,7 +143,7 @@ export class MdastCommonMarkParser extends Parser {
         try {
           // Parse markdown to mdast using unified ecosystem
           const mdastRoot = fromMarkdown(inputText) as Root;
-          
+
           // Convert mdast to Lezer tree
           tree = mdastToLezerTree(mdastRoot, inputText);
           finished = true;
