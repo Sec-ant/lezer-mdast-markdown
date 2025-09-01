@@ -95,6 +95,9 @@ importers:
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
+      unist-util-inspect:
+        specifier: ^8.1.0
+        version: 8.1.0
       unplugin-lezer:
         specifier: ^1.0.1
         version: 1.0.1(patch_hash=8ebcaf7b45c8c252a3864582d3b25f48deaa3e208633d83f693f5e4c994549fc)(esbuild@0.25.5)(rollup@4.44.1)(vite@7.0.6(@types/node@24.2.0)(tsx@4.20.3)(yaml@2.8.0))
@@ -1432,6 +1435,9 @@ packages:
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
+
+  unist-util-inspect@8.1.0:
+    resolution: {integrity: sha512-mOlg8Mp33pR0eeFpo5d2902ojqFFOKMMG2hF8bmH7ZlhnmjFgh0NI3/ZDwdaBJNbvrS7LZFVrBVtIE9KZ9s7vQ==}
 
   unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}
@@ -2968,6 +2974,10 @@ snapshots:
       is-plain-obj: 4.1.0
       trough: 2.2.0
       vfile: 6.0.3
+
+  unist-util-inspect@8.1.0:
+    dependencies:
+      '@types/unist': 3.0.3
 
   unist-util-is@6.0.0:
     dependencies:

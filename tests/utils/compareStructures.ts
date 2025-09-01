@@ -87,10 +87,19 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
 
       // For nodes that contain processed content, we need to re-process
       if (node.type.name === "InlineCode") {
-        // Remove surrounding backticks and process content
-        const match = content.match(/^`(.+?)`$/s);
+        // Remove surrounding backticks (can be multiple) and process content
+        const match = content.match(/^(`+)(.+?)\1$/s);
         if (match) {
-          content = match[1];
+          content = match[2];
+        } else {
+          // Fallback for edge cases - try to find content between balanced backticks
+          let start = 0;
+          let end = content.length;
+          while (start < content.length && content[start] === "`") start++;
+          while (end > 0 && content[end - 1] === "`") end--;
+          if (start < end) {
+            content = content.slice(start, end);
+          }
         }
       } else if (node.type.name === "Code") {
         // For fenced code blocks, extract just the content
@@ -147,6 +156,18 @@ function collectLezer(tree: LezerTree, markdown: string): NormalizedNode {
           .replace(/\\\|/g, "|")
           .replace(/\\\}/g, "}")
           .replace(/\\~/g, "~");
+
+        // Process HTML entities (basic common ones)
+        content = content
+          .replace(/&nbsp;/g, " ")
+          .replace(/&amp;/g, "&")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&quot;/g, '"')
+          .replace(/&apos;/g, "'")
+          .replace(/&copy;/g, "©")
+          .replace(/&reg;/g, "®")
+          .replace(/&trade;/g, "™");
       }
 
       const normalized: NormalizedNode = {

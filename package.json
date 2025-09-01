@@ -91,6 +91,7 @@
     "simple-git-hooks": "^2.13.1",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2",
+    "unist-util-inspect": "^8.1.0",
     "unplugin-lezer": "^1.0.1",
     "vite": "^7.0.6",
     "vitest": "^3.2.4"
