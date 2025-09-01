@@ -1,2 +1,2 @@
-// Direct micromark-based parser (no LR grammar)
-export { parser } from "./direct-parser";
+// MDAST-based parser using unified ecosystem
+export { parser } from "./mdast-to-lezer";
