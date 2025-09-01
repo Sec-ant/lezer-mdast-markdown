@@ -375,9 +375,37 @@ export function synthesizeStructuralEvents(
           });
           lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
         } else {
-          // For all paragraphs, let the grammar handle the structure
-          // Don't generate paragraphText tokens here - let the individual inline and text tokens be processed
-          // The grammar will combine them into the proper paragraph structure
+          // For regular paragraphs, check if they contain inline elements
+          const hasInlineElements = events.some(
+            (e) =>
+              e.start >= ev.start &&
+              e.end <= ev.end &&
+              (e.tokenType === "emphasis" ||
+                e.tokenType === "strong" ||
+                e.tokenType === "codeText" ||
+                e.tokenType === "link" ||
+                e.tokenType === "image" ||
+                e.tokenType === "autolink"),
+          );
+
+          if (hasInlineElements) {
+            // For complex paragraphs, ensure proper token boundaries
+            // The individual inline and textContent tokens will be generated
+            // to create the proper phrasing structure
+          } else {
+            // Generate paragraphText token for simple paragraphs
+            const paragraphContent = text.slice(ev.start, ev.end).trim();
+            if (paragraphContent.length > 0) {
+              out.push({
+                type: "exit",
+                tokenType: "paragraphText",
+                start: ev.start,
+                end: ev.end,
+                value: paragraphContent,
+              });
+              lastEmittedEnd = Math.max(lastEmittedEnd, ev.end);
+            }
+          }
         }
 
         currentParagraph = null;
