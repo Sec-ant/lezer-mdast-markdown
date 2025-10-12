@@ -1,0 +1,272 @@
+[
+  {
+    "markdown": "[link](/uri \"title\")\n"
+  },
+  {
+    "markdown": "[link](/uri)\n"
+  },
+  {
+    "markdown": "[](./target.md)\n"
+  },
+  {
+    "markdown": "[link]()\n"
+  },
+  {
+    "markdown": "[link](<>)\n"
+  },
+  {
+    "markdown": "[]()\n"
+  },
+  {
+    "markdown": "[link](/my uri)\n"
+  },
+  {
+    "markdown": "[link](</my uri>)\n"
+  },
+  {
+    "markdown": "[link](foo\nbar)\n"
+  },
+  {
+    "markdown": "[link](<foo\nbar>)\n"
+  },
+  {
+    "markdown": "[a](<b)c>)\n"
+  },
+  {
+    "markdown": "[link](<foo\\>)\n"
+  },
+  {
+    "markdown": "[a](<b)c\n[a](<b)c>\n[a](<b>c)\n"
+  },
+  {
+    "markdown": "[link](\\(foo\\))\n"
+  },
+  {
+    "markdown": "[link](foo(and(bar)))\n"
+  },
+  {
+    "markdown": "[link](foo(and(bar))\n"
+  },
+  {
+    "markdown": "[link](foo\\(and\\(bar\\))\n"
+  },
+  {
+    "markdown": "[link](<foo(and(bar)>)\n"
+  },
+  {
+    "markdown": "[link](foo\\)\\:)\n"
+  },
+  {
+    "markdown": "[link](#fragment)\n\n[link](https://example.com#fragment)\n\n[link](https://example.com?foo=3#frag)\n"
+  },
+  {
+    "markdown": "[link](foo\\bar)\n"
+  },
+  {
+    "markdown": "[link](foo%20b&auml;)\n"
+  },
+  {
+    "markdown": "[link](\"title\")\n"
+  },
+  {
+    "markdown": "[link](/url \"title\")\n[link](/url 'title')\n[link](/url (title))\n"
+  },
+  {
+    "markdown": "[link](/url \"title \\\"&quot;\")\n"
+  },
+  {
+    "markdown": "[link](/url \"title\")\n"
+  },
+  {
+    "markdown": "[link](/url \"title \"and\" title\")\n"
+  },
+  {
+    "markdown": "[link](/url 'title \"and\" title')\n"
+  },
+  {
+    "markdown": "[link](   /uri\n  \"title\"  )\n"
+  },
+  {
+    "markdown": "[link] (/uri)\n"
+  },
+  {
+    "markdown": "[link [foo [bar]]](/uri)\n"
+  },
+  {
+    "markdown": "[link] bar](/uri)\n"
+  },
+  {
+    "markdown": "[link [bar](/uri)\n"
+  },
+  {
+    "markdown": "[link \\[bar](/uri)\n"
+  },
+  {
+    "markdown": "[link *foo **bar** `#`*](/uri)\n"
+  },
+  {
+    "markdown": "[![moon](moon.jpg)](/uri)\n"
+  },
+  {
+    "markdown": "[foo [bar](/uri)](/uri)\n"
+  },
+  {
+    "markdown": "[foo *[bar [baz](/uri)](/uri)*](/uri)\n"
+  },
+  {
+    "markdown": "![[[foo](uri1)](uri2)](uri3)\n"
+  },
+  {
+    "markdown": "*[foo*](/uri)\n"
+  },
+  {
+    "markdown": "[foo *bar](baz*)\n"
+  },
+  {
+    "markdown": "*foo [bar* baz]\n"
+  },
+  {
+    "markdown": "[foo <bar attr=\"](baz)\">\n"
+  },
+  {
+    "markdown": "[foo`](/uri)`\n"
+  },
+  {
+    "markdown": "[foo<https://example.com/?search=](uri)>\n"
+  },
+  {
+    "markdown": "[foo][bar]\n\n[bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[link [foo [bar]]][ref]\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[link \\[bar][ref]\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[link *foo **bar** `#`*][ref]\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[![moon](moon.jpg)][ref]\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[foo [bar](/uri)][ref]\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[foo *bar [baz][ref]*][ref]\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "*[foo*][ref]\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[foo *bar][ref]*\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[foo <bar attr=\"][ref]\">\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[foo`][ref]`\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[foo<https://example.com/?search=][ref]>\n\n[ref]: /uri\n"
+  },
+  {
+    "markdown": "[foo][BaR]\n\n[bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[ẞ]\n\n[SS]: /url\n"
+  },
+  {
+    "markdown": "[Foo\n  bar]: /url\n\n[Baz][Foo bar]\n"
+  },
+  {
+    "markdown": "[foo] [bar]\n\n[bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[foo]\n[bar]\n\n[bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[foo]: /url1\n\n[foo]: /url2\n\n[bar][foo]\n"
+  },
+  {
+    "markdown": "[bar][foo\\!]\n\n[foo!]: /url\n"
+  },
+  {
+    "markdown": "[foo][ref[]\n\n[ref[]: /uri\n"
+  },
+  {
+    "markdown": "[foo][ref[bar]]\n\n[ref[bar]]: /uri\n"
+  },
+  {
+    "markdown": "[[[foo]]]\n\n[[[foo]]]: /url\n"
+  },
+  {
+    "markdown": "[foo][ref\\[]\n\n[ref\\[]: /uri\n"
+  },
+  {
+    "markdown": "[bar\\\\]: /uri\n\n[bar\\\\]\n"
+  },
+  {
+    "markdown": "[]\n\n[]: /uri\n"
+  },
+  {
+    "markdown": "[\n ]\n\n[\n ]: /uri\n"
+  },
+  {
+    "markdown": "[foo][]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[*foo* bar][]\n\n[*foo* bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[Foo][]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[foo] \n[]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[foo]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[*foo* bar]\n\n[*foo* bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[[*foo* bar]]\n\n[*foo* bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[[bar [foo]\n\n[foo]: /url\n"
+  },
+  {
+    "markdown": "[Foo]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[foo] bar\n\n[foo]: /url\n"
+  },
+  {
+    "markdown": "\\[foo]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "[foo*]: /url\n\n*[foo*]\n"
+  },
+  {
+    "markdown": "[foo][bar]\n\n[foo]: /url1\n[bar]: /url2\n"
+  },
+  {
+    "markdown": "[foo][]\n\n[foo]: /url1\n"
+  },
+  {
+    "markdown": "[foo]()\n\n[foo]: /url1\n"
+  },
+  {
+    "markdown": "[foo](not a link)\n\n[foo]: /url1\n"
+  },
+  {
+    "markdown": "[foo][bar][baz]\n\n[baz]: /url\n"
+  },
+  {
+    "markdown": "[foo][bar][baz]\n\n[baz]: /url1\n[bar]: /url2\n"
+  },
+  {
+    "markdown": "[foo][bar][baz]\n\n[baz]: /url1\n[foo]: /url2\n"
+  }
+]

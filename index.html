@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lezer-markdown Demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        color-scheme: light dark;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        margin: 0;
+        padding: 1.5rem;
+        background: #f6f8fa;
+        color: #24292f;
+      }
+
+      h1 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.75rem;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      main {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        background: #ffffff;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(31, 35, 40, 0.12);
+      }
+
+      .panel-header {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #d0d7de;
+        background: #f6f8fa;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #57606a;
+      }
+
+      .panel-content {
+        padding: 1rem;
+      }
+
+      #info {
+        margin: 0;
+        padding: 0;
+        background: #f6f8fa;
+        border-radius: 4px;
+        overflow: auto;
+        max-height: 70vh;
+        font-family:
+          "SF Mono", Monaco, "Cascadia Code", "Courier New", monospace;
+        font-size: 0.8125rem;
+        line-height: 1.5;
+        color: #24292f;
+        scroll-padding-top: 6rem; /* Prevent content from being hidden under sticky header */
+      }
+
+      .info-header {
+        padding: 1rem;
+        white-space: pre-wrap;
+        border-bottom: 1px solid #d0d7de;
+        background: #f6f8fa;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+
+      .tree-line {
+        padding: 0.25rem 1rem;
+        white-space: pre;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+      }
+
+      .tree-line:hover {
+        background-color: #ddf4ff;
+      }
+
+      .tree-line.active {
+        background-color: #54aeff;
+        color: #ffffff;
+      }
+
+      .cm-editor {
+        height: 70vh;
+        border: 1px solid #d0d7de;
+        border-radius: 4px;
+        font-size: 0.875rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>lezer-markdown Demo</h1>
+    <main>
+      <div class="panel">
+        <div class="panel-header">Markdown Editor</div>
+        <div class="panel-content">
+          <div id="editor"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">Parser Output</div>
+        <div class="panel-content">
+          <pre id="info">Loading...</pre>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="/demo/index.ts"></script>
+  </body>
+</html>

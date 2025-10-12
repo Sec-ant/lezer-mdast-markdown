@@ -1,0 +1,89 @@
+[
+  {
+    "markdown": "```\n<\n >\n```\n"
+  },
+  {
+    "markdown": "~~~\n<\n >\n~~~\n"
+  },
+  {
+    "markdown": "``\nfoo\n``\n"
+  },
+  {
+    "markdown": "```\naaa\n~~~\n```\n"
+  },
+  {
+    "markdown": "~~~\naaa\n```\n~~~\n"
+  },
+  {
+    "markdown": "````\naaa\n```\n``````\n"
+  },
+  {
+    "markdown": "~~~~\naaa\n~~~\n~~~~\n"
+  },
+  {
+    "markdown": "```\n"
+  },
+  {
+    "markdown": "`````\n\n```\naaa\n"
+  },
+  {
+    "markdown": "> ```\n> aaa\n\nbbb\n"
+  },
+  {
+    "markdown": "```\n\n  \n```\n"
+  },
+  {
+    "markdown": "```\n```\n"
+  },
+  {
+    "markdown": " ```\n aaa\naaa\n```\n"
+  },
+  {
+    "markdown": "  ```\naaa\n  aaa\naaa\n  ```\n"
+  },
+  {
+    "markdown": "   ```\n   aaa\n    aaa\n  aaa\n   ```\n"
+  },
+  {
+    "markdown": "    ```\n    aaa\n    ```\n"
+  },
+  {
+    "markdown": "```\naaa\n  ```\n"
+  },
+  {
+    "markdown": "   ```\naaa\n  ```\n"
+  },
+  {
+    "markdown": "```\naaa\n    ```\n"
+  },
+  {
+    "markdown": "``` ```\naaa\n"
+  },
+  {
+    "markdown": "~~~~~~\naaa\n~~~ ~~\n"
+  },
+  {
+    "markdown": "foo\n```\nbar\n```\nbaz\n"
+  },
+  {
+    "markdown": "foo\n---\n~~~\nbar\n~~~\n# baz\n"
+  },
+  {
+    "markdown": "```ruby\ndef foo(x)\n  return 3\nend\n```\n"
+  },
+  {
+    "markdown": "~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~\n"
+  },
+  {
+    "markdown": "````;\n````\n"
+  },
+  {
+    "markdown": "``` aa ```\nfoo\n"
+  },
+  {
+    "markdown": "~~~ aa ``` ~~~\nfoo\n~~~\n"
+  },
+  {
+    "markdown": "```\n``` aaa\n```\n"
+  }
+]

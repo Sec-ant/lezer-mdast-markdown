@@ -1,0 +1,35 @@
+[
+  {
+    "markdown": "[www.commonmark.org](http://www.commonmark.org)\n"
+  },
+  {
+    "markdown": "Visit [www.commonmark.org/help](http://www.commonmark.org/help) for more information.\n"
+  },
+  {
+    "markdown": "Visit [www.commonmark.org](http://www.commonmark.org).\n\nVisit [www.commonmark.org/a.b](http://www.commonmark.org/a.b).\n"
+  },
+  {
+    "markdown": "[www.google.com/search?q=Markup+(business)](http://www.google.com/search?q=Markup+\\(business\\))\n\n[www.google.com/search?q=Markup+(business)](http://www.google.com/search?q=Markup+\\(business\\))))\n\n([www.google.com/search?q=Markup+(business)](http://www.google.com/search?q=Markup+\\(business\\)))\n\n([www.google.com/search?q=Markup+(business)](http://www.google.com/search?q=Markup+\\(business\\))\n"
+  },
+  {
+    "markdown": "[www.google.com/search?q=(business))+ok](http://www.google.com/search?q=\\(business\\)\\)+ok)\n"
+  },
+  {
+    "markdown": "[www.google.com/search?q=commonmark\\&hl=en](http://www.google.com/search?q=commonmark\\&hl=en)\n\n[www.google.com/search?q=commonmark](http://www.google.com/search?q=commonmark)\\&hl;\n"
+  },
+  {
+    "markdown": "[www.commonmark.org/he](http://www.commonmark.org/he)\\<lp\n"
+  },
+  {
+    "markdown": "<http://commonmark.org>\n\n(Visit <https://encrypted.google.com/search?q=Markup+(business)>)\n"
+  },
+  {
+    "markdown": "<foo@bar.baz>\n"
+  },
+  {
+    "markdown": "hello\\@mail+xyz.example isn't valid, but <hello+xyz@mail.example> is.\n"
+  },
+  {
+    "markdown": "<a.b-c_d@a.b>\n\n<a.b-c_d@a.b>.\n\na.b-c\\_d\\@a.b-\n\na.b-c\\_d\\@a.b\\_\n"
+  }
+]

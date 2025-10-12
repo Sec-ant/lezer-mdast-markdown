@@ -1,0 +1,56 @@
+[
+  {
+    "markdown": "---"
+  },
+  {
+    "markdown": "---\n---"
+  },
+  {
+    "markdown": "---\na\n\nb\n---"
+  },
+  {
+    "markdown": "---\na\n\nb\n---\n# Heading\n***\n    code"
+  },
+  {
+    "markdown": " ---\n---"
+  },
+  {
+    "markdown": "---\n ---"
+  },
+  {
+    "markdown": "---  \n---\t "
+  },
+  {
+    "markdown": "--- --\n---"
+  },
+  {
+    "markdown": "---\n--- x"
+  },
+  {
+    "markdown": "----\n---"
+  },
+  {
+    "markdown": "---\n----"
+  },
+  {
+    "markdown": "--\n---"
+  },
+  {
+    "markdown": "---\n--"
+  },
+  {
+    "markdown": "---\na\nb\n---"
+  },
+  {
+    "markdown": "# Hello\n---\na\n\nb\n---\n+++"
+  },
+  {
+    "markdown": "a\n---\nb\n---"
+  },
+  {
+    "markdown": "---\nasd\n..."
+  },
+  {
+    "markdown": "---\nasd"
+  }
+]

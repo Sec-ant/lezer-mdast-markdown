@@ -1,0 +1,59 @@
+[
+  {
+    "markdown": "<http://foo.bar.baz>\n"
+  },
+  {
+    "markdown": "<https://foo.bar.baz/test?q=hello&id=22&boolean>\n"
+  },
+  {
+    "markdown": "<irc://foo.bar:2233/baz>\n"
+  },
+  {
+    "markdown": "<MAILTO:FOO@BAR.BAZ>\n"
+  },
+  {
+    "markdown": "<a+b+c:d>\n"
+  },
+  {
+    "markdown": "<made-up-scheme://foo,bar>\n"
+  },
+  {
+    "markdown": "<https://../>\n"
+  },
+  {
+    "markdown": "<localhost:5001/foo>\n"
+  },
+  {
+    "markdown": "<https://foo.bar/baz bim>\n"
+  },
+  {
+    "markdown": "<https://example.com/\\[\\>\n"
+  },
+  {
+    "markdown": "<foo@bar.example.com>\n"
+  },
+  {
+    "markdown": "<foo+special@Bar.baz-bar0.com>\n"
+  },
+  {
+    "markdown": "<foo\\+@bar.example.com>\n"
+  },
+  {
+    "markdown": "<>\n"
+  },
+  {
+    "markdown": "< https://foo.bar >\n"
+  },
+  {
+    "markdown": "<m:abc>\n"
+  },
+  {
+    "markdown": "<foo.bar.baz>\n"
+  },
+  {
+    "markdown": "https://example.com\n"
+  },
+  {
+    "markdown": "foo@bar.example.com\n"
+  }
+]

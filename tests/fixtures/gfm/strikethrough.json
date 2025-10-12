@@ -1,0 +1,11 @@
+[
+  {
+    "markdown": "~~Hi~~ Hello, ~~there~~ world!\n"
+  },
+  {
+    "markdown": "This \\~\\~has a\n\nnew paragraph\\~\\~.\n"
+  },
+  {
+    "markdown": "This will \\~\\~\\~not\\~\\~\\~ strike.\n"
+  }
+]

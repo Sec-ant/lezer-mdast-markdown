@@ -1,0 +1,47 @@
+[
+  {
+    "markdown": "$a$, $$b$$, $$$c$$$"
+  },
+  {
+    "markdown": "a \\$b$"
+  },
+  {
+    "markdown": "a $b\\$"
+  },
+  {
+    "markdown": "a \\$$b$"
+  },
+  {
+    "markdown": "a $$ $ $$"
+  },
+  {
+    "markdown": "a $$\\\raisebox{0.25em}{$\\frac a b$}$$ b"
+  },
+  {
+    "markdown": "a $$ \\$ $$ b"
+  },
+  {
+    "markdown": "a $b$"
+  },
+  {
+    "markdown": "a $$b$$"
+  },
+  {
+    "markdown": "a $$$b$$$"
+  },
+  {
+    "markdown": "a $b\nc\rd\r\ne$ f"
+  },
+  {
+    "markdown": "$\na\n$"
+  },
+  {
+    "markdown": "a $\\sum_{\\substack{0<i<m\\\\0<j<n}}$ b"
+  },
+  {
+    "markdown": "a $\\\text{a \"{a} c}$ b"
+  },
+  {
+    "markdown": "a\n> $$"
+  }
+]

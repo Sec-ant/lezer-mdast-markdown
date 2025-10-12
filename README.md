@@ -1,127 +1,292 @@
-# lezer-commonmark
+# lezer-markdown
 
-[![npm](https://img.shields.io/npm/v/lezer-commonmark)](https://www.npmjs.com/package/lezer-commonmark) [![npm bundle size](https://img.shields.io/bundlephobia/minzip/lezer-commonmark)](https://www.npmjs.com/package/lezer-commonmark) [![license](https://img.shields.io/npm/l/lezer-commonmark)](./LICENSE)
+A Markdown parser for [Lezer](https://lezer.codemirror.net/), designed for [CodeMirror 6](https://codemirror.net/6/).
 
-一个基于 [Lezer](https://lezer.codemirror.net/) + micromark external tokenizer 的 **CommonMark 解析器**（进行中 WIP）。目标：
+## Overview
 
-1. 语义与 micromark 完全一致（块级 + 行内）
-2. 通过官方 CommonMark 测试套件
-3. 支持增量解析与 CodeMirror 生态集成
-4. 提供语法高亮与类型安全的树遍历 API
+This parser provides Markdown support for CodeMirror 6, implementing the CommonMark and GitHub Flavored Markdown (GFM) specifications. It leverages [mdast-util-from-markdown](https://github.com/syntax-tree/mdast-util-from-markdown) for parsing and converts the resulting [MDAST](https://github.com/syntax-tree/mdast) (Markdown Abstract Syntax Tree) to Lezer's tree format. This approach ensures 100% specification compliance while maintaining compatibility with the Lezer parsing system.
 
-## Install
+## Key Features
 
-```bash
-pnpm add lezer-commonmark
-```
+- **Full Specification Compliance**: Passes all [CommonMark specification](https://spec.commonmark.org/) tests
+- **GFM Support**: Built-in support for GitHub Flavored Markdown extensions (tables, strikethrough, task lists, autolinks)
+- **Property Preservation**: MDAST node attributes (heading levels, code languages, link URLs, etc.) are preserved as Lezer NodeProps
+- **Extensible**: Clean API for adding support for custom Markdown extensions (directives, MDX, etc.)
+- **Type Safe**: Full TypeScript support with proper type inference
 
-## Development
-
-这个项目使用 `unplugin-lezer/vite` 来处理语法文件。开发时的常用命令：
+## Installation
 
 ```bash
-git clone https://github.com/Sec-ant/lezer-commonmark
-cd lezer-commonmark
-pnpm install
-
-# 开发时生成 grammar 文件（运行测试或脚本前需要）
-npm run dev:grammar
-
-# 运行测试
-npm test
-
-# 构建（自动处理 grammar）
-npm run build
-
-# 清理生成的开发文件
-npm run clean:grammar
+npm install lezer-markdown
 ```
 
-更多构建说明请参考 [GRAMMAR_BUILD.md](./GRAMMAR_BUILD.md)。
+## Basic Usage
 
-## Features
+### As CodeMirror 6 Language
 
-- CommonMark 块级元素：段落、标题、分隔线、引用、代码块、列表（进行中）
-- 行内元素：强调、链接、图片、代码片段、自动链接（逐步实现）
-- 与 micromark 同步的 external tokenizer 映射；无重复实现状态机
-- 增量解析（Lezer LR） + 可扩展（后续 GFM 扩展）
+```typescript
+import { markdown } from "lezer-markdown";
+import { EditorView, basicSetup } from "codemirror";
 
-## Usage
+const view = new EditorView({
+  extensions: [basicSetup, markdown()],
+  parent: document.body,
+});
+```
 
-### Basic
+### Direct Parser Usage
 
-```ts
-import { parser } from "lezer-commonmark";
+```typescript
+import { parser } from "lezer-markdown";
 
-const tree = parser.parse(`# Hello\n\nSome *text*.`);
+const tree = parser.parse("# Hello World\n\nThis is **bold** text.");
 console.log(tree.toString());
 ```
 
-### With CodeMirror
+## Property Preservation
 
-```ts
-import { parser } from "lezer-commonmark";
-import { LRLanguage } from "@codemirror/language";
+MDAST node attributes are preserved as Lezer NodeProps and can be accessed programmatically:
 
-export const commonmarkLanguage = LRLanguage.define({
-  parser,
-  languageData: { name: "markdown" },
-});
-```
+````typescript
+import { parser, depthProp, langProp } from "lezer-markdown";
 
-### Tree Navigation
+const tree = parser.parse("# Heading\n\n```js\ncode\n```");
 
-```ts
-import { parser, headingLine, paragraphText } from "lezer-commonmark";
-
-const tree = parser.parse(`# Title\n\nParagraph`);
 tree.iterate({
   enter(node) {
-    if (node.type.id === headingLine) {
-      console.log("Heading span:", node.from, node.to);
+    // Access heading depth
+    if (node.name === "Heading") {
+      const depth = node.tree?.prop(depthProp);
+      console.log("Heading level:", depth); // 1
     }
-    if (node.type.id === paragraphText) {
-      console.log("Paragraph:", node.from, node.to);
+
+    // Access code block language
+    if (node.name === "Code") {
+      const lang = node.tree?.prop(langProp);
+      console.log("Language:", lang); // 'js'
     }
   },
 });
-```
+````
 
-### Error Handling
+### Available Properties
 
-```ts
-import { parser } from "lezer-commonmark";
+All properties are exported as NodeProp instances and can be reused in custom extensions:
 
-const tree = parser.parse("> quote\n\n---");
-tree.iterate({
-  enter(n) {
-    if (n.type.isError) console.warn("Error span", n.from, n.to);
-  },
+- `depthProp`: Heading level (1-6)
+- `langProp`: Code block language
+- `metaProp`: Code block metadata
+- `orderedProp`: List ordered state
+- `startProp`: List start number
+- `spreadProp`: List/item spread status
+- `checkedProp`: Task list item checked state (GFM)
+- `alignProp`: Table column alignments (GFM)
+- `urlProp`: Link/image URL
+- `titleProp`: Link/image title
+- `identifierProp`: Link/image reference identifier
+- `labelProp`: Link/image reference label
+
+## Extension Support
+
+The parser can be extended to support custom Markdown syntax through the mdast extension ecosystem:
+
+```typescript
+import { createParser } from "lezer-markdown";
+import type { NodePropMaps } from "lezer-markdown";
+import { NodeProp } from "@lezer/common";
+import { directive } from "micromark-extension-directive";
+import { directiveFromMarkdown } from "mdast-util-directive";
+
+// Define custom properties
+const directiveNameProp = new NodeProp<string>({ perNode: true });
+
+// Create extended parser with custom property mappings
+const parser = createParser({
+  extensions: [directive()],
+  mdastExtensions: [directiveFromMarkdown()],
+  customMaps: {
+    TextDirective: {
+      name: directiveNameProp,
+    },
+  } satisfies NodePropMaps,
 });
+
+// Parse directive syntax
+const tree = parser.parse(":emoji[😊]");
 ```
 
-## API
+### Built-in Extensions
 
-### Exports
+#### YAML Frontmatter
 
-- `parser` - Lezer parser 实例
-- Grammar terms - 语法节点 / token 的常量（TypeScript id）
-  - （后续）高亮与 GFM 扩展将追加导出
+The parser includes built-in support for YAML frontmatter (commonly used in static site generators):
 
-### Types
+```typescript
+import { createParser } from "lezer-markdown";
+import { frontmatter } from "micromark-extension-frontmatter";
+import { frontmatterFromMarkdown } from "mdast-util-frontmatter";
 
-```ts
-parser.parse(input: string, fragments?: TreeFragment[], ranges?: {from: number, to: number}[]): Tree
+const parser = createParser({
+  extensions: [frontmatter(["yaml"])],
+  mdastExtensions: [frontmatterFromMarkdown(["yaml"])],
+});
+
+const tree = parser.parse(`---
+title: My Document
+author: John Doe
+---
+
+# Content here`);
 ```
+
+#### Math Extensions
+
+Math support (inline: `$...$`, block: `$$...$$`) can be added as an extension:
+
+```typescript
+import { createParser, metaProp } from "lezer-markdown";
+import type { NodePropMaps } from "lezer-markdown";
+import { math } from "micromark-extension-math";
+import { mathFromMarkdown } from "mdast-util-math";
+
+const parser = createParser({
+  extensions: [math()],
+  mdastExtensions: [mathFromMarkdown()],
+  customMaps: {
+    // Reuse built-in metaProp for block math
+    Math: { meta: metaProp },
+    InlineMath: {},
+  } satisfies NodePropMaps,
+});
+
+// Parse math syntax
+const tree = parser.parse(`Inline: $E = mc^2$
+
+Block:
+$$
+\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}
+$$`);
+```
+
+**Note**: Math extensions require additional packages:
+
+```bash
+npm install micromark-extension-math mdast-util-math
+```
+
+The test suite includes 32 math test cases extracted from micromark-extension-math.
+
+## Architecture
+
+### Design Philosophy
+
+This parser takes a different approach from traditional Lezer parsers:
+
+1. **Parse with mdast-util-from-markdown**: Use the well-tested, spec-compliant mdast parser
+2. **Transform to Lezer Tree**: Convert the MDAST to Lezer's tree structure
+3. **Preserve Semantics**: Maintain node attributes as Lezer NodeProps
+
+This design prioritizes correctness and maintainability over incremental parsing performance. For typical document editing scenarios, the performance is sufficient and the benefits of guaranteed spec compliance outweigh the trade-offs.
+
+### Why Not Pure Lezer Grammar?
+
+Writing a complete, correct Markdown parser (especially one that fully implements CommonMark and GFM specifications) using Lezer's grammar system is extremely challenging due to:
+
+- Complex context-dependent parsing rules (e.g., list item parsing)
+- Precedence and delimiter matching (emphasis, links)
+- HTML block detection rules
+- Line-ending normalization
+
+By leveraging the mdast ecosystem, we get:
+
+- Proven correctness (100% spec compliance)
+- Compatibility with the rich mdast plugin ecosystem
+- Easier maintenance and updates
+
+## Testing
+
+The parser is tested against:
+
+- 652 CommonMark specification examples
+- GitHub Flavored Markdown extensions (tables, strikethrough, task lists, autolinks)
+- YAML frontmatter support
+- Math extensions (inline and block)
+- Property preservation
+- Extension API
+
+Total: 743 passing tests
+
+## API Reference
+
+### `markdown(config?)`
+
+Creates a CodeMirror 6 language extension with Markdown support (CommonMark + GFM).
+
+**Parameters:**
+
+- `config`: Optional parser configuration
+
+**Returns:** `LanguageSupport`
+
+### `parser`
+
+Default parser instance with Markdown support (CommonMark + GFM specifications).
+
+### `createParser(options)`
+
+Creates a custom parser instance with extended functionality.
+
+**Options:**
+
+- `extensions`: micromark syntax extensions
+- `mdastExtensions`: mdast conversion extensions
+- `customMaps`: Custom node property mappings (type: `NodePropMaps`)
+
+### `collectProps(node, customMaps?)`
+
+Collects properties from an MDAST node based on built-in and optional custom property mappings.
+
+**Parameters:**
+
+- `node`: MDAST node
+- `customMaps`: Optional custom property mappings
+
+**Returns:** Record of property values
+
+### `collectNodeProps(node, customMaps?)`
+
+Collects properties from a Lezer tree cursor node.
+
+**Parameters:**
+
+- `node`: Object with `type` (NodeType) and `tree` (Tree)
+- `customMaps`: Optional custom property mappings
+
+**Returns:** Record of property values
+
+## Performance Considerations
+
+This parser is optimized for correctness rather than incremental parsing. For most documents (< 10,000 lines), parsing performance is imperceptible. For very large documents, consider:
+
+- Splitting into multiple files
+- Using virtual scrolling for rendering
+- Implementing custom caching strategies
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. 添加或调整 CommonMark fixture（放入 `tests/fixtures/`）
-4. Ensure tests pass
-5. Submit a pull request
+Contributions are welcome! Please ensure:
+
+- All tests pass (`pnpm test`)
+- Code follows the existing style (`pnpm check`)
+- TypeScript types are properly maintained
 
 ## License
 
 MIT
+
+## Related Projects
+
+- [CodeMirror 6](https://codemirror.net/6/) - The extensible code editor
+- [Lezer](https://lezer.codemirror.net/) - Incremental parser system
+- [mdast](https://github.com/syntax-tree/mdast) - Markdown Abstract Syntax Tree
+- [micromark](https://github.com/micromark/micromark) - CommonMark-compliant markdown parser

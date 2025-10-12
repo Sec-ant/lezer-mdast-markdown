@@ -1,0 +1,398 @@
+[
+  {
+    "markdown": "*foo bar*\n"
+  },
+  {
+    "markdown": "a * foo bar*\n"
+  },
+  {
+    "markdown": "a*\"foo\"*\n"
+  },
+  {
+    "markdown": "* a *\n"
+  },
+  {
+    "markdown": "*$*alpha.\n\n*£*bravo.\n\n*€*charlie.\n"
+  },
+  {
+    "markdown": "foo*bar*\n"
+  },
+  {
+    "markdown": "5*6*78\n"
+  },
+  {
+    "markdown": "_foo bar_\n"
+  },
+  {
+    "markdown": "_ foo bar_\n"
+  },
+  {
+    "markdown": "a_\"foo\"_\n"
+  },
+  {
+    "markdown": "foo_bar_\n"
+  },
+  {
+    "markdown": "5_6_78\n"
+  },
+  {
+    "markdown": "пристаням_стремятся_\n"
+  },
+  {
+    "markdown": "aa_\"bb\"_cc\n"
+  },
+  {
+    "markdown": "foo-_(bar)_\n"
+  },
+  {
+    "markdown": "_foo*\n"
+  },
+  {
+    "markdown": "*foo bar *\n"
+  },
+  {
+    "markdown": "*foo bar\n*\n"
+  },
+  {
+    "markdown": "*(*foo)\n"
+  },
+  {
+    "markdown": "*(*foo*)*\n"
+  },
+  {
+    "markdown": "*foo*bar\n"
+  },
+  {
+    "markdown": "_foo bar _\n"
+  },
+  {
+    "markdown": "_(_foo)\n"
+  },
+  {
+    "markdown": "_(_foo_)_\n"
+  },
+  {
+    "markdown": "_foo_bar\n"
+  },
+  {
+    "markdown": "_пристаням_стремятся\n"
+  },
+  {
+    "markdown": "_foo_bar_baz_\n"
+  },
+  {
+    "markdown": "_(bar)_.\n"
+  },
+  {
+    "markdown": "**foo bar**\n"
+  },
+  {
+    "markdown": "** foo bar**\n"
+  },
+  {
+    "markdown": "a**\"foo\"**\n"
+  },
+  {
+    "markdown": "foo**bar**\n"
+  },
+  {
+    "markdown": "__foo bar__\n"
+  },
+  {
+    "markdown": "__ foo bar__\n"
+  },
+  {
+    "markdown": "__\nfoo bar__\n"
+  },
+  {
+    "markdown": "a__\"foo\"__\n"
+  },
+  {
+    "markdown": "foo__bar__\n"
+  },
+  {
+    "markdown": "5__6__78\n"
+  },
+  {
+    "markdown": "пристаням__стремятся__\n"
+  },
+  {
+    "markdown": "__foo, __bar__, baz__\n"
+  },
+  {
+    "markdown": "foo-__(bar)__\n"
+  },
+  {
+    "markdown": "**foo bar **\n"
+  },
+  {
+    "markdown": "**(**foo)\n"
+  },
+  {
+    "markdown": "*(**foo**)*\n"
+  },
+  {
+    "markdown": "**Gomphocarpus (*Gomphocarpus physocarpus*, syn.\n*Asclepias physocarpa*)**\n"
+  },
+  {
+    "markdown": "**foo \"*bar*\" foo**\n"
+  },
+  {
+    "markdown": "**foo**bar\n"
+  },
+  {
+    "markdown": "__foo bar __\n"
+  },
+  {
+    "markdown": "__(__foo)\n"
+  },
+  {
+    "markdown": "_(__foo__)_\n"
+  },
+  {
+    "markdown": "__foo__bar\n"
+  },
+  {
+    "markdown": "__пристаням__стремятся\n"
+  },
+  {
+    "markdown": "__foo__bar__baz__\n"
+  },
+  {
+    "markdown": "__(bar)__.\n"
+  },
+  {
+    "markdown": "*foo [bar](/url)*\n"
+  },
+  {
+    "markdown": "*foo\nbar*\n"
+  },
+  {
+    "markdown": "_foo __bar__ baz_\n"
+  },
+  {
+    "markdown": "_foo _bar_ baz_\n"
+  },
+  {
+    "markdown": "__foo_ bar_\n"
+  },
+  {
+    "markdown": "*foo *bar**\n"
+  },
+  {
+    "markdown": "*foo **bar** baz*\n"
+  },
+  {
+    "markdown": "*foo**bar**baz*\n"
+  },
+  {
+    "markdown": "*foo**bar*\n"
+  },
+  {
+    "markdown": "***foo** bar*\n"
+  },
+  {
+    "markdown": "*foo **bar***\n"
+  },
+  {
+    "markdown": "*foo**bar***\n"
+  },
+  {
+    "markdown": "foo***bar***baz\n"
+  },
+  {
+    "markdown": "foo******bar*********baz\n"
+  },
+  {
+    "markdown": "*foo **bar *baz* bim** bop*\n"
+  },
+  {
+    "markdown": "*foo [*bar*](/url)*\n"
+  },
+  {
+    "markdown": "** is not an empty emphasis\n"
+  },
+  {
+    "markdown": "**** is not an empty strong emphasis\n"
+  },
+  {
+    "markdown": "**foo [bar](/url)**\n"
+  },
+  {
+    "markdown": "**foo\nbar**\n"
+  },
+  {
+    "markdown": "__foo _bar_ baz__\n"
+  },
+  {
+    "markdown": "__foo __bar__ baz__\n"
+  },
+  {
+    "markdown": "____foo__ bar__\n"
+  },
+  {
+    "markdown": "**foo **bar****\n"
+  },
+  {
+    "markdown": "**foo *bar* baz**\n"
+  },
+  {
+    "markdown": "**foo*bar*baz**\n"
+  },
+  {
+    "markdown": "***foo* bar**\n"
+  },
+  {
+    "markdown": "**foo *bar***\n"
+  },
+  {
+    "markdown": "**foo *bar **baz**\nbim* bop**\n"
+  },
+  {
+    "markdown": "**foo [*bar*](/url)**\n"
+  },
+  {
+    "markdown": "__ is not an empty emphasis\n"
+  },
+  {
+    "markdown": "____ is not an empty strong emphasis\n"
+  },
+  {
+    "markdown": "foo ***\n"
+  },
+  {
+    "markdown": "foo *\\**\n"
+  },
+  {
+    "markdown": "foo *_*\n"
+  },
+  {
+    "markdown": "foo *****\n"
+  },
+  {
+    "markdown": "foo **\\***\n"
+  },
+  {
+    "markdown": "foo **_**\n"
+  },
+  {
+    "markdown": "**foo*\n"
+  },
+  {
+    "markdown": "*foo**\n"
+  },
+  {
+    "markdown": "***foo**\n"
+  },
+  {
+    "markdown": "****foo*\n"
+  },
+  {
+    "markdown": "**foo***\n"
+  },
+  {
+    "markdown": "*foo****\n"
+  },
+  {
+    "markdown": "foo ___\n"
+  },
+  {
+    "markdown": "foo _\\__\n"
+  },
+  {
+    "markdown": "foo _*_\n"
+  },
+  {
+    "markdown": "foo _____\n"
+  },
+  {
+    "markdown": "foo __\\___\n"
+  },
+  {
+    "markdown": "foo __*__\n"
+  },
+  {
+    "markdown": "__foo_\n"
+  },
+  {
+    "markdown": "_foo__\n"
+  },
+  {
+    "markdown": "___foo__\n"
+  },
+  {
+    "markdown": "____foo_\n"
+  },
+  {
+    "markdown": "__foo___\n"
+  },
+  {
+    "markdown": "_foo____\n"
+  },
+  {
+    "markdown": "**foo**\n"
+  },
+  {
+    "markdown": "*_foo_*\n"
+  },
+  {
+    "markdown": "__foo__\n"
+  },
+  {
+    "markdown": "_*foo*_\n"
+  },
+  {
+    "markdown": "****foo****\n"
+  },
+  {
+    "markdown": "____foo____\n"
+  },
+  {
+    "markdown": "******foo******\n"
+  },
+  {
+    "markdown": "***foo***\n"
+  },
+  {
+    "markdown": "_____foo_____\n"
+  },
+  {
+    "markdown": "*foo _bar* baz_\n"
+  },
+  {
+    "markdown": "*foo __bar *baz bim__ bam*\n"
+  },
+  {
+    "markdown": "**foo **bar baz**\n"
+  },
+  {
+    "markdown": "*foo *bar baz*\n"
+  },
+  {
+    "markdown": "*[bar*](/url)\n"
+  },
+  {
+    "markdown": "_foo [bar_](/url)\n"
+  },
+  {
+    "markdown": "*<img src=\"foo\" title=\"*\"/>\n"
+  },
+  {
+    "markdown": "**<a href=\"**\">\n"
+  },
+  {
+    "markdown": "__<a href=\"__\">\n"
+  },
+  {
+    "markdown": "*a `*`*\n"
+  },
+  {
+    "markdown": "_a `_`_\n"
+  },
+  {
+    "markdown": "**a<https://foo.bar/?q=**>\n"
+  },
+  {
+    "markdown": "__a<https://foo.bar/?q=__>\n"
+  }
+]

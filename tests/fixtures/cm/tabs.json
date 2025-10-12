@@ -1,0 +1,35 @@
+[
+  {
+    "markdown": "\tfoo\tbaz\t\tbim\n"
+  },
+  {
+    "markdown": "  \tfoo\tbaz\t\tbim\n"
+  },
+  {
+    "markdown": "    a\ta\n    ὐ\ta\n"
+  },
+  {
+    "markdown": "  - foo\n\n\tbar\n"
+  },
+  {
+    "markdown": "- foo\n\n\t\tbar\n"
+  },
+  {
+    "markdown": ">\t\tfoo\n"
+  },
+  {
+    "markdown": "-\t\tfoo\n"
+  },
+  {
+    "markdown": "    foo\n\tbar\n"
+  },
+  {
+    "markdown": " - foo\n   - bar\n\t - baz\n"
+  },
+  {
+    "markdown": "#\tFoo\n"
+  },
+  {
+    "markdown": "*\t*\t*\t\n"
+  }
+]

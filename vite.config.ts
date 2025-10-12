@@ -1,4 +1,3 @@
-import lezer from "unplugin-lezer/vite";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -17,7 +16,6 @@ export default defineConfig({
     conditions: ["node", "default"],
     mainFields: ["main", "module"],
   },
-  plugins: [lezer()],
   test: {
     globals: true,
     environment: "node",

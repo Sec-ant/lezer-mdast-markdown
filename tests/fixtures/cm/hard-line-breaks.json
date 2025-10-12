@@ -1,0 +1,47 @@
+[
+  {
+    "markdown": "foo  \nbaz\n"
+  },
+  {
+    "markdown": "foo\\\nbaz\n"
+  },
+  {
+    "markdown": "foo       \nbaz\n"
+  },
+  {
+    "markdown": "foo  \n     bar\n"
+  },
+  {
+    "markdown": "foo\\\n     bar\n"
+  },
+  {
+    "markdown": "*foo  \nbar*\n"
+  },
+  {
+    "markdown": "*foo\\\nbar*\n"
+  },
+  {
+    "markdown": "`code  \nspan`\n"
+  },
+  {
+    "markdown": "`code\\\nspan`\n"
+  },
+  {
+    "markdown": "<a href=\"foo  \nbar\">\n"
+  },
+  {
+    "markdown": "<a href=\"foo\\\nbar\">\n"
+  },
+  {
+    "markdown": "foo\\\n"
+  },
+  {
+    "markdown": "foo  \n"
+  },
+  {
+    "markdown": "### foo\\\n"
+  },
+  {
+    "markdown": "### foo  \n"
+  }
+]

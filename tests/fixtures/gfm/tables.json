@@ -1,0 +1,26 @@
+[
+  {
+    "markdown": "| foo | bar |\n| --- | --- |\n| baz | bim |\n"
+  },
+  {
+    "markdown": "| abc | defghi |\n| :-: | -----: |\n| bar |    baz |\n"
+  },
+  {
+    "markdown": "| f\\|oo       |\n| ----------- |\n| b `\\|` az   |\n| b **\\|** im |\n"
+  },
+  {
+    "markdown": "| abc | def |\n| --- | --- |\n| bar | baz |\n\n> bar\n"
+  },
+  {
+    "markdown": "| abc | def |\n| --- | --- |\n| bar | baz |\n| bar |     |\n\nbar\n"
+  },
+  {
+    "markdown": "\\| abc | def |\n\\| --- |\n\\| bar |\n"
+  },
+  {
+    "markdown": "| abc | def |     |\n| --- | --- | --- |\n| bar |     |     |\n| bar | baz | boo |\n"
+  },
+  {
+    "markdown": "| abc | def |\n| --- | --- |\n"
+  }
+]

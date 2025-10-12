@@ -1,0 +1,59 @@
+[
+  {
+    "markdown": "***\n---\n___\n"
+  },
+  {
+    "markdown": "+++\n"
+  },
+  {
+    "markdown": "===\n"
+  },
+  {
+    "markdown": "--\n**\n__\n"
+  },
+  {
+    "markdown": " ***\n  ***\n   ***\n"
+  },
+  {
+    "markdown": "    ***\n"
+  },
+  {
+    "markdown": "Foo\n    ***\n"
+  },
+  {
+    "markdown": "_____________________________________\n"
+  },
+  {
+    "markdown": " - - -\n"
+  },
+  {
+    "markdown": " **  * ** * ** * **\n"
+  },
+  {
+    "markdown": "-     -      -      -\n"
+  },
+  {
+    "markdown": "- - - -    \n"
+  },
+  {
+    "markdown": "_ _ _ _ a\n\na------\n\n---a---\n"
+  },
+  {
+    "markdown": " *-*\n"
+  },
+  {
+    "markdown": "- foo\n***\n- bar\n"
+  },
+  {
+    "markdown": "Foo\n***\nbar\n"
+  },
+  {
+    "markdown": "Foo\n---\nbar\n"
+  },
+  {
+    "markdown": "* Foo\n* * *\n* Bar\n"
+  },
+  {
+    "markdown": "- Foo\n- * * *\n"
+  }
+]

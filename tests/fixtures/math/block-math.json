@@ -1,0 +1,53 @@
+[
+  {
+    "markdown": "$a$, $$b$$\n\n$$\nc\n$$"
+  },
+  {
+    "markdown": "a $$\na\\$ $$ b"
+  },
+  {
+    "markdown": "$$\na\n$$"
+  },
+  {
+    "markdown": "$$$\na\n$$$"
+  },
+  {
+    "markdown": "$$\n$$"
+  },
+  {
+    "markdown": "$$\na"
+  },
+  {
+    "markdown": "$$\na\n"
+  },
+  {
+    "markdown": "$$asd &amp; \\& asd\na\n$$"
+  },
+  {
+    "markdown": "$$asd$asd\na\n$$"
+  },
+  {
+    "markdown": "$$\na\n$$ b"
+  },
+  {
+    "markdown": "$$\na\n$$  "
+  },
+  {
+    "markdown": "  $$\n\ta\n  b\n c\nd\n$$"
+  },
+  {
+    "markdown": "      $$\n      a\n          $$"
+  },
+  {
+    "markdown": "> $$\n> a\n> $$\n> b"
+  },
+  {
+    "markdown": "* $$\n  a\n  $$\n  b"
+  },
+  {
+    "markdown": "> $$\na\n$$"
+  },
+  {
+    "markdown": "> $$\n> a\n$$"
+  }
+]

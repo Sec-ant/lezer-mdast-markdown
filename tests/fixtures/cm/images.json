@@ -1,0 +1,68 @@
+[
+  {
+    "markdown": "![foo](/url \"title\")\n"
+  },
+  {
+    "markdown": "![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"\n"
+  },
+  {
+    "markdown": "![foo ![bar](/url)](/url2)\n"
+  },
+  {
+    "markdown": "![foo [bar](/url)](/url2)\n"
+  },
+  {
+    "markdown": "![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\"\n"
+  },
+  {
+    "markdown": "![foo *bar*][foobar]\n\n[FOOBAR]: train.jpg \"train & tracks\"\n"
+  },
+  {
+    "markdown": "![foo](train.jpg)\n"
+  },
+  {
+    "markdown": "My ![foo bar](/path/to/train.jpg  \"title\"   )\n"
+  },
+  {
+    "markdown": "![foo](<url>)\n"
+  },
+  {
+    "markdown": "![](/url)\n"
+  },
+  {
+    "markdown": "![foo][bar]\n\n[bar]: /url\n"
+  },
+  {
+    "markdown": "![foo][bar]\n\n[BAR]: /url\n"
+  },
+  {
+    "markdown": "![foo][]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "![*foo* bar][]\n\n[*foo* bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "![Foo][]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "![foo] \n[]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "![foo]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "![*foo* bar]\n\n[*foo* bar]: /url \"title\"\n"
+  },
+  {
+    "markdown": "![[foo]]\n\n[[foo]]: /url \"title\"\n"
+  },
+  {
+    "markdown": "![Foo]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "!\\[foo]\n\n[foo]: /url \"title\"\n"
+  },
+  {
+    "markdown": "\\![foo]\n\n[foo]: /url \"title\"\n"
+  }
+]

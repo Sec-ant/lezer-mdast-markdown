@@ -1,0 +1,83 @@
+[
+  {
+    "markdown": "Foo *bar*\n=========\n\nFoo *bar*\n---------\n"
+  },
+  {
+    "markdown": "Foo *bar\nbaz*\n====\n"
+  },
+  {
+    "markdown": "  Foo *bar\nbaz*\t\n====\n"
+  },
+  {
+    "markdown": "Foo\n-------------------------\n\nFoo\n=\n"
+  },
+  {
+    "markdown": "   Foo\n---\n\n  Foo\n-----\n\n  Foo\n  ===\n"
+  },
+  {
+    "markdown": "    Foo\n    ---\n\n    Foo\n---\n"
+  },
+  {
+    "markdown": "Foo\n   ----      \n"
+  },
+  {
+    "markdown": "Foo\n    ---\n"
+  },
+  {
+    "markdown": "Foo\n= =\n\nFoo\n--- -\n"
+  },
+  {
+    "markdown": "Foo  \n-----\n"
+  },
+  {
+    "markdown": "Foo\\\n----\n"
+  },
+  {
+    "markdown": "`Foo\n----\n`\n\n<a title=\"a lot\n---\nof dashes\"/>\n"
+  },
+  {
+    "markdown": "> Foo\n---\n"
+  },
+  {
+    "markdown": "> foo\nbar\n===\n"
+  },
+  {
+    "markdown": "- Foo\n---\n"
+  },
+  {
+    "markdown": "Foo\nBar\n---\n"
+  },
+  {
+    "markdown": "---\nFoo\n---\nBar\n---\nBaz\n"
+  },
+  {
+    "markdown": "\n====\n"
+  },
+  {
+    "markdown": "---\n---\n"
+  },
+  {
+    "markdown": "- foo\n-----\n"
+  },
+  {
+    "markdown": "    foo\n---\n"
+  },
+  {
+    "markdown": "> foo\n-----\n"
+  },
+  {
+    "markdown": "\\> foo\n------\n"
+  },
+  {
+    "markdown": "Foo\n\nbar\n---\nbaz\n"
+  },
+  {
+    "markdown": "Foo\nbar\n\n---\n\nbaz\n"
+  },
+  {
+    "markdown": "Foo\nbar\n* * *\nbaz\n"
+  },
+  {
+    "markdown": "Foo\nbar\n\\---\nbaz\n"
+  }
+]

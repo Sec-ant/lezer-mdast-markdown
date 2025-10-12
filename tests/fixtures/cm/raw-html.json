@@ -1,0 +1,62 @@
+[
+  {
+    "markdown": "<a><bab><c2c>\n"
+  },
+  {
+    "markdown": "<a/><b2/>\n"
+  },
+  {
+    "markdown": "<a  /><b2\ndata=\"foo\" >\n"
+  },
+  {
+    "markdown": "<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />\n"
+  },
+  {
+    "markdown": "Foo <responsive-image src=\"foo.jpg\" />\n"
+  },
+  {
+    "markdown": "<33> <__>\n"
+  },
+  {
+    "markdown": "<a h*#ref=\"hi\">\n"
+  },
+  {
+    "markdown": "<a href=\"hi'> <a href=hi'>\n"
+  },
+  {
+    "markdown": "< a><\nfoo><bar/ >\n<foo bar=baz\nbim!bop />\n"
+  },
+  {
+    "markdown": "<a href='bar'title=title>\n"
+  },
+  {
+    "markdown": "</a></foo >\n"
+  },
+  {
+    "markdown": "</a href=\"foo\">\n"
+  },
+  {
+    "markdown": "foo <!-- this is a --\ncomment - with hyphens -->\n"
+  },
+  {
+    "markdown": "foo <!--> foo -->\n\nfoo <!---> foo -->\n"
+  },
+  {
+    "markdown": "foo <?php echo $a; ?>\n"
+  },
+  {
+    "markdown": "foo <!ELEMENT br EMPTY>\n"
+  },
+  {
+    "markdown": "foo <![CDATA[>&<]]>\n"
+  },
+  {
+    "markdown": "foo <a href=\"&ouml;\">\n"
+  },
+  {
+    "markdown": "foo <a href=\"\\*\">\n"
+  },
+  {
+    "markdown": "<a href=\"\\\"\">\n"
+  }
+]

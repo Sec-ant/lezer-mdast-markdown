@@ -1,0 +1,77 @@
+[
+  {
+    "markdown": "> # Foo\n> bar\n> baz\n"
+  },
+  {
+    "markdown": "># Foo\n>bar\n> baz\n"
+  },
+  {
+    "markdown": "   > # Foo\n   > bar\n > baz\n"
+  },
+  {
+    "markdown": "    > # Foo\n    > bar\n    > baz\n"
+  },
+  {
+    "markdown": "> # Foo\n> bar\nbaz\n"
+  },
+  {
+    "markdown": "> bar\nbaz\n> foo\n"
+  },
+  {
+    "markdown": "> foo\n---\n"
+  },
+  {
+    "markdown": "> - foo\n- bar\n"
+  },
+  {
+    "markdown": ">     foo\n    bar\n"
+  },
+  {
+    "markdown": "> ```\nfoo\n```\n"
+  },
+  {
+    "markdown": "> foo\n    - bar\n"
+  },
+  {
+    "markdown": ">\n"
+  },
+  {
+    "markdown": ">\n>  \n> \n"
+  },
+  {
+    "markdown": ">\n> foo\n>  \n"
+  },
+  {
+    "markdown": "> foo\n\n> bar\n"
+  },
+  {
+    "markdown": "> foo\n> bar\n"
+  },
+  {
+    "markdown": "> foo\n>\n> bar\n"
+  },
+  {
+    "markdown": "foo\n> bar\n"
+  },
+  {
+    "markdown": "> aaa\n***\n> bbb\n"
+  },
+  {
+    "markdown": "> bar\nbaz\n"
+  },
+  {
+    "markdown": "> bar\n\nbaz\n"
+  },
+  {
+    "markdown": "> bar\n>\nbaz\n"
+  },
+  {
+    "markdown": "> > > foo\nbar\n"
+  },
+  {
+    "markdown": ">>> foo\n> bar\n>>baz\n"
+  },
+  {
+    "markdown": ">     code\n\n>    not code\n"
+  }
+]

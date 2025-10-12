@@ -1,0 +1,41 @@
+[
+  {
+    "markdown": "\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\=\\>\\?\\@\\[\\\\\\]\\^\\_\\`\\{\\|\\}\\~\n"
+  },
+  {
+    "markdown": "\\\t\\A\\a\\ \\3\\φ\\«\n"
+  },
+  {
+    "markdown": "\\*not emphasized*\n\\<br/> not a tag\n\\[not a link](/foo)\n\\`not code`\n1\\. not a list\n\\* not a list\n\\# not a heading\n\\[foo]: /url \"not a reference\"\n\\&ouml; not a character entity\n"
+  },
+  {
+    "markdown": "\\\\*emphasis*\n"
+  },
+  {
+    "markdown": "foo\\\nbar\n"
+  },
+  {
+    "markdown": "`` \\[\\` ``\n"
+  },
+  {
+    "markdown": "    \\[\\]\n"
+  },
+  {
+    "markdown": "~~~\n\\[\\]\n~~~\n"
+  },
+  {
+    "markdown": "<https://example.com?find=\\*>\n"
+  },
+  {
+    "markdown": "<a href=\"/bar\\/)\">\n"
+  },
+  {
+    "markdown": "[foo](/bar\\* \"ti\\*tle\")\n"
+  },
+  {
+    "markdown": "[foo]\n\n[foo]: /bar\\* \"ti\\*tle\"\n"
+  },
+  {
+    "markdown": "``` foo\\+bar\nfoo\n```\n"
+  }
+]

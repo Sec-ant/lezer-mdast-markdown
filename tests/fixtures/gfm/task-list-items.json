@@ -1,0 +1,8 @@
+[
+  {
+    "markdown": "* [ ] foo\n* [x] bar\n"
+  },
+  {
+    "markdown": "* [x] foo\n  * [ ] bar\n  * [x] baz\n* [ ] bim\n"
+  }
+]
