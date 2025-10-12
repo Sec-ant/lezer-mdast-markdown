@@ -4,15 +4,17 @@ A Markdown parser for [Lezer](https://lezer.codemirror.net/), designed for [Code
 
 ## Overview
 
-This parser provides Markdown support for CodeMirror 6, implementing the CommonMark and GitHub Flavored Markdown (GFM) specifications. It leverages [mdast-util-from-markdown](https://github.com/syntax-tree/mdast-util-from-markdown) for parsing and converts the resulting [MDAST](https://github.com/syntax-tree/mdast) (Markdown Abstract Syntax Tree) to Lezer's tree format. This approach ensures 100% specification compliance while maintaining compatibility with the Lezer parsing system.
+This parser provides CommonMark-compliant Markdown support for CodeMirror 6. It leverages [mdast-util-from-markdown](https://github.com/syntax-tree/mdast-util-from-markdown) for parsing and converts the resulting [MDAST](https://github.com/syntax-tree/mdast) (Markdown Abstract Syntax Tree) to Lezer's tree format. This approach ensures 100% specification compliance while maintaining compatibility with the Lezer parsing system.
+
+The default parser supports CommonMark only. Additional syntax (GFM, frontmatter, math, etc.) can be added through the mdast extension ecosystem.
 
 ## Key Features
 
-- **Full Specification Compliance**: Passes all [CommonMark specification](https://spec.commonmark.org/) tests
-- **GFM Support**: Built-in support for GitHub Flavored Markdown extensions (tables, strikethrough, task lists, autolinks)
+- **CommonMark Compliance**: Passes all 652 [CommonMark specification](https://spec.commonmark.org/) tests
+- **Extensible**: Support for GFM, YAML frontmatter, math, and other mdast extensions
 - **Property Preservation**: MDAST node attributes (heading levels, code languages, link URLs, etc.) are preserved as Lezer NodeProps
-- **Extensible**: Clean API for adding support for custom Markdown extensions (directives, MDX, etc.)
 - **Type Safe**: Full TypeScript support with proper type inference
+- **Ecosystem Integration**: Works with the rich mdast plugin ecosystem
 
 ## Installation
 
@@ -24,12 +26,34 @@ npm install lezer-markdown
 
 ### As CodeMirror 6 Language
 
+The default setup provides CommonMark support:
+
 ```typescript
 import { markdown } from "lezer-markdown";
 import { EditorView, basicSetup } from "codemirror";
 
 const view = new EditorView({
   extensions: [basicSetup, markdown()],
+  parent: document.body,
+});
+```
+
+For GFM support, pass the extensions:
+
+```typescript
+import { markdown } from "lezer-markdown";
+import { gfm } from "micromark-extension-gfm";
+import { gfmFromMarkdown } from "mdast-util-gfm";
+import { EditorView, basicSetup } from "codemirror";
+
+const view = new EditorView({
+  extensions: [
+    basicSetup,
+    markdown({
+      extensions: [gfm()],
+      mdastExtensions: [gfmFromMarkdown()],
+    }),
+  ],
   parent: document.body,
 });
 ```
@@ -88,38 +112,50 @@ All properties are exported as NodeProp instances and can be reused in custom ex
 
 ## Extension Support
 
-The parser can be extended to support custom Markdown syntax through the mdast extension ecosystem:
+The default parser supports **CommonMark specification only**. Additional Markdown syntax can be added through the mdast extension ecosystem.
+
+Extensions fall into two categories based on whether you need to define custom node properties:
+
+### Extensions with Pre-defined Node Types
+
+These extensions have node types and properties already defined in this package (matching the mdast specification). You only need to load the micromark extensions.
+
+#### GitHub Flavored Markdown (GFM)
+
+The most commonly used extension. Adds tables, strikethrough, task lists, and autolinks:
 
 ```typescript
 import { createParser } from "lezer-markdown";
-import type { NodePropMaps } from "lezer-markdown";
-import { NodeProp } from "@lezer/common";
-import { directive } from "micromark-extension-directive";
-import { directiveFromMarkdown } from "mdast-util-directive";
+import { gfm } from "micromark-extension-gfm";
+import { gfmFromMarkdown } from "mdast-util-gfm";
 
-// Define custom properties
-const directiveNameProp = new NodeProp<string>({ perNode: true });
-
-// Create extended parser with custom property mappings
 const parser = createParser({
-  extensions: [directive()],
-  mdastExtensions: [directiveFromMarkdown()],
-  customMaps: {
-    TextDirective: {
-      name: directiveNameProp,
-    },
-  } satisfies NodePropMaps,
+  extensions: [gfm()],
+  mdastExtensions: [gfmFromMarkdown()],
 });
 
-// Parse directive syntax
-const tree = parser.parse(":emoji[😊]");
+// Parse GFM syntax
+const tree = parser.parse(`
+| Column 1 | Column 2 |
+| -------- | -------- |
+| Cell 1   | Cell 2   |
+
+- [x] Task 1
+- [ ] Task 2
+
+~~strikethrough~~
+`);
 ```
 
-### Built-in Extensions
+**Install GFM packages:**
+
+```bash
+npm install micromark-extension-gfm mdast-util-gfm
+```
 
 #### YAML Frontmatter
 
-The parser includes built-in support for YAML frontmatter (commonly used in static site generators):
+Commonly used in static site generators:
 
 ```typescript
 import { createParser } from "lezer-markdown";
@@ -133,15 +169,41 @@ const parser = createParser({
 
 const tree = parser.parse(`---
 title: My Document
-author: John Doe
 ---
 
-# Content here`);
+# Content`);
 ```
 
-#### Math Extensions
+### Extensions Requiring Custom Node Properties
 
-Math support (inline: `$...$`, block: `$$...$$`) can be added as an extension:
+For extensions not covered by mdast's standard types, you need to define custom node properties using `customMaps`:
+
+#### Directive Extension Example
+
+```typescript
+import { createParser } from "lezer-markdown";
+import type { NodePropMaps } from "lezer-markdown";
+import { NodeProp } from "@lezer/common";
+import { directive } from "micromark-extension-directive";
+import { directiveFromMarkdown } from "mdast-util-directive";
+
+// Define custom properties for directive nodes
+const directiveNameProp = new NodeProp<string>({ perNode: true });
+
+const parser = createParser({
+  extensions: [directive()],
+  mdastExtensions: [directiveFromMarkdown()],
+  customMaps: {
+    TextDirective: {
+      name: directiveNameProp,
+    },
+  } satisfies NodePropMaps,
+});
+
+const tree = parser.parse(":emoji[😊]");
+```
+
+#### Math Extension Example
 
 ```typescript
 import { createParser, metaProp } from "lezer-markdown";
@@ -159,7 +221,6 @@ const parser = createParser({
   } satisfies NodePropMaps,
 });
 
-// Parse math syntax
 const tree = parser.parse(`Inline: $E = mc^2$
 
 Block:
@@ -168,13 +229,11 @@ $$
 $$`);
 ```
 
-**Note**: Math extensions require additional packages:
+**Install math packages:**
 
 ```bash
 npm install micromark-extension-math mdast-util-math
 ```
-
-The test suite includes 32 math test cases extracted from micromark-extension-math.
 
 ## Architecture
 
@@ -190,7 +249,7 @@ This design prioritizes correctness and maintainability over incremental parsing
 
 ### Why Not Pure Lezer Grammar?
 
-Writing a complete, correct Markdown parser (especially one that fully implements CommonMark and GFM specifications) using Lezer's grammar system is extremely challenging due to:
+Writing a complete, correct Markdown parser (especially one that fully implements CommonMark) using Lezer's grammar system is extremely challenging due to:
 
 - Complex context-dependent parsing rules (e.g., list item parsing)
 - Precedence and delimiter matching (emphasis, links)
@@ -220,17 +279,17 @@ Total: 743 passing tests
 
 ### `markdown(config?)`
 
-Creates a CodeMirror 6 language extension with Markdown support (CommonMark + GFM).
+Creates a CodeMirror 6 language extension with CommonMark support. Pass `config` with extensions for GFM or other syntax.
 
 **Parameters:**
 
-- `config`: Optional parser configuration
+- `config`: Optional parser configuration (same as `createParser` options)
 
 **Returns:** `LanguageSupport`
 
 ### `parser`
 
-Default parser instance with Markdown support (CommonMark + GFM specifications).
+Default parser instance with CommonMark support only.
 
 ### `createParser(options)`
 
