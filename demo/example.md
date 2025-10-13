@@ -1,13 +1,13 @@
 ---
 title: Markdown Demo
 description: Comprehensive example showcasing CommonMark and GFM features
-author: lezer-markdown
+author: lezer-mdast-markdown
 tags: [markdown, parser, demo]
 ---
 
-# lezer-markdown Demo
+# lezer-mdast-markdown Demo
 
-A **Markdown** parser for [Lezer](https://lezer.codemirror.net/) supporting CommonMark and GFM.
+A **Markdown** parser for [Lezer](https://lezer.codemirror.net/) leveraging the mdast ecosystem.
 
 ## CommonMark Features
 

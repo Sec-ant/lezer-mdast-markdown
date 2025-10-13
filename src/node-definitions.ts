@@ -98,7 +98,7 @@ export type PropConfig = {
  *
  * @example
  * ```ts
- * import { createNodePropConfig } from 'lezer-markdown';
+ * import { createNodePropConfig } from 'lezer-mdast-markdown';
  * import type { TextDirective } from 'mdast-util-directive';
  *
  * const config = createNodePropConfig<TextDirective>('textDirective', {
@@ -202,7 +202,7 @@ export const referenceTypeProp = new NodeProp<
  * @example
  * ```ts
  * // Preferred: Use individual exported props
- * import { metaProp } from 'lezer-markdown';
+ * import { metaProp } from 'lezer-mdast-markdown';
  * const customMaps = { Math: { meta: metaProp } };
  * ```
  */
@@ -404,7 +404,7 @@ export function collectProps(
  *
  * @example
  * ```ts
- * import { collectNodeProps } from 'lezer-markdown';
+ * import { collectNodeProps } from 'lezer-mdast-markdown';
  *
  * tree.iterate({
  *   enter(node) {

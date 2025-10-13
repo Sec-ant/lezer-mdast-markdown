@@ -1,6 +1,6 @@
 /**
  * Markdown Parser for Lezer
- * Supports CommonMark and GFM specifications
+ * Supports CommonMark specification with extensible mdast plugin support
  * Uses mdast-util-from-markdown internally for 100% compliance
  */
 import {
@@ -27,7 +27,7 @@ export interface ParserOptions extends FromMarkdownOptions {
    *
    * @example
    * ```ts
-   * import { defineNodeProps, createParser } from 'lezer-markdown';
+   * import { defineNodeProps, createParser } from 'lezer-mdast-markdown';
    * import { NodeProp } from '@lezer/common';
    * import { directive, directiveFromMarkdown } from 'micromark-extension-directive';
    * import type { TextDirective } from 'mdast-util-directive';
@@ -50,7 +50,7 @@ export interface ParserOptions extends FromMarkdownOptions {
 
 /**
  * Markdown Parser implementation
- * Supports CommonMark and GFM specifications
+ * Supports CommonMark specification with extensible mdast plugin support
  */
 export class MarkdownParser extends Parser {
   readonly nodeSet: NodeSet;
@@ -182,7 +182,7 @@ export function createParser(options: ParserOptions = {}): MarkdownParser {
 
 /**
  * Default Markdown parser instance
- * Supports CommonMark and GFM specifications
- * For custom extensions, use createParser() or parser.configure()
+ * Supports CommonMark specification only
+ * For GFM or other extensions, use createParser() or parser.configure()
  */
 export const parser = createParser();

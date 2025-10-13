@@ -1,12 +1,16 @@
-# lezer-markdown
+# lezer-mdast-markdown
 
 A Markdown parser for [Lezer](https://lezer.codemirror.net/), designed for [CodeMirror 6](https://codemirror.net/6/).
 
 ## Overview
 
-This parser provides CommonMark-compliant Markdown support for CodeMirror 6. It leverages [mdast-util-from-markdown](https://github.com/syntax-tree/mdast-util-from-markdown) for parsing and converts the resulting [MDAST](https://github.com/syntax-tree/mdast) (Markdown Abstract Syntax Tree) to Lezer's tree format. This approach ensures 100% specification compliance while maintaining compatibility with the Lezer parsing system.
+This parser bridges Markdown editing in CodeMirror 6 with the rich [mdast](https://github.com/syntax-tree/mdast) (Markdown Abstract Syntax Tree) ecosystem. By leveraging [mdast-util-from-markdown](https://github.com/syntax-tree/mdast-util-from-markdown) for parsing and converting the result to Lezer's tree format, it enables consistent tooling across editing, rendering, and linting workflows.
 
-The default parser supports CommonMark only. Additional syntax (GFM, frontmatter, math, etc.) can be added through the mdast extension ecosystem.
+**Key motivation**: Reuse existing mdast plugins instead of reimplementing the same functionality for different Markdown representations. This means editors, static site generators, and linters can share the same extension ecosystem, providing a unified experience when working with Markdown.
+
+The default parser supports CommonMark only. Additional syntax (GFM, frontmatter, math, directives, etc.) can be added through micromark and mdast extensions.
+
+> **Note**: If you need an incremental parser with better performance characteristics, consider using [@lezer/markdown](https://github.com/lezer-parser/markdown) and [@codemirror/lang-markdown](https://github.com/codemirror/lang-markdown) instead. This project prioritizes mdast ecosystem integration over incremental parsing performance.
 
 ## Key Features
 
@@ -19,7 +23,7 @@ The default parser supports CommonMark only. Additional syntax (GFM, frontmatter
 ## Installation
 
 ```bash
-npm install lezer-markdown
+npm install lezer-mdast-markdown
 ```
 
 ## Basic Usage
@@ -29,7 +33,7 @@ npm install lezer-markdown
 The default setup provides CommonMark support:
 
 ```typescript
-import { markdown } from "lezer-markdown";
+import { markdown } from "lezer-mdast-markdown";
 import { EditorView, basicSetup } from "codemirror";
 
 const view = new EditorView({
@@ -41,7 +45,7 @@ const view = new EditorView({
 For GFM support, pass the extensions:
 
 ```typescript
-import { markdown } from "lezer-markdown";
+import { markdown } from "lezer-mdast-markdown";
 import { gfm } from "micromark-extension-gfm";
 import { gfmFromMarkdown } from "mdast-util-gfm";
 import { EditorView, basicSetup } from "codemirror";
@@ -61,7 +65,7 @@ const view = new EditorView({
 ### Direct Parser Usage
 
 ```typescript
-import { parser } from "lezer-markdown";
+import { parser } from "lezer-mdast-markdown";
 
 const tree = parser.parse("# Hello World\n\nThis is **bold** text.");
 console.log(tree.toString());
@@ -72,7 +76,7 @@ console.log(tree.toString());
 MDAST node attributes are preserved as Lezer NodeProps and can be accessed programmatically:
 
 ````typescript
-import { parser, depthProp, langProp } from "lezer-markdown";
+import { parser, depthProp, langProp } from "lezer-mdast-markdown";
 
 const tree = parser.parse("# Heading\n\n```js\ncode\n```");
 
@@ -125,7 +129,7 @@ These extensions have node types and properties already defined in this package 
 The most commonly used extension. Adds tables, strikethrough, task lists, and autolinks:
 
 ```typescript
-import { createParser } from "lezer-markdown";
+import { createParser } from "lezer-mdast-markdown";
 import { gfm } from "micromark-extension-gfm";
 import { gfmFromMarkdown } from "mdast-util-gfm";
 
@@ -158,7 +162,7 @@ npm install micromark-extension-gfm mdast-util-gfm
 Commonly used in static site generators:
 
 ```typescript
-import { createParser } from "lezer-markdown";
+import { createParser } from "lezer-mdast-markdown";
 import { frontmatter } from "micromark-extension-frontmatter";
 import { frontmatterFromMarkdown } from "mdast-util-frontmatter";
 
@@ -178,36 +182,11 @@ title: My Document
 
 For extensions not covered by mdast's standard types, you need to define custom node properties using `customMaps`:
 
-#### Directive Extension Example
-
-```typescript
-import { createParser } from "lezer-markdown";
-import type { NodePropMaps } from "lezer-markdown";
-import { NodeProp } from "@lezer/common";
-import { directive } from "micromark-extension-directive";
-import { directiveFromMarkdown } from "mdast-util-directive";
-
-// Define custom properties for directive nodes
-const directiveNameProp = new NodeProp<string>({ perNode: true });
-
-const parser = createParser({
-  extensions: [directive()],
-  mdastExtensions: [directiveFromMarkdown()],
-  customMaps: {
-    TextDirective: {
-      name: directiveNameProp,
-    },
-  } satisfies NodePropMaps,
-});
-
-const tree = parser.parse(":emoji[😊]");
-```
-
 #### Math Extension Example
 
 ```typescript
-import { createParser, metaProp } from "lezer-markdown";
-import type { NodePropMaps } from "lezer-markdown";
+import { createParser, metaProp } from "lezer-mdast-markdown";
+import type { NodePropMaps } from "lezer-mdast-markdown";
 import { math } from "micromark-extension-math";
 import { mathFromMarkdown } from "mdast-util-math";
 
@@ -235,32 +214,56 @@ $$`);
 npm install micromark-extension-math mdast-util-math
 ```
 
+#### Directive Extension Example
+
+```typescript
+import { createParser } from "lezer-mdast-markdown";
+import type { NodePropMaps } from "lezer-mdast-markdown";
+import { NodeProp } from "@lezer/common";
+import { directive } from "micromark-extension-directive";
+import { directiveFromMarkdown } from "mdast-util-directive";
+
+// Define custom properties for directive nodes
+const directiveNameProp = new NodeProp<string>({ perNode: true });
+
+const parser = createParser({
+  extensions: [directive()],
+  mdastExtensions: [directiveFromMarkdown()],
+  customMaps: {
+    TextDirective: {
+      name: directiveNameProp,
+    },
+  } satisfies NodePropMaps,
+});
+
+const tree = parser.parse(":emoji[😊]");
+```
+
+**Install directive packages:**
+
+```bash
+npm install micromark-extension-directive mdast-util-directive
+```
+
 ## Architecture
 
 ### Design Philosophy
 
-This parser takes a different approach from traditional Lezer parsers:
+This parser bridges Markdown editing with the mdast ecosystem:
 
 1. **Parse with mdast-util-from-markdown**: Use the well-tested, spec-compliant mdast parser
 2. **Transform to Lezer Tree**: Convert the MDAST to Lezer's tree structure
 3. **Preserve Semantics**: Maintain node attributes as Lezer NodeProps
 
-This design prioritizes correctness and maintainability over incremental parsing performance. For typical document editing scenarios, the performance is sufficient and the benefits of guaranteed spec compliance outweigh the trade-offs.
-
-### Why Not Pure Lezer Grammar?
-
-Writing a complete, correct Markdown parser (especially one that fully implements CommonMark) using Lezer's grammar system is extremely challenging due to:
-
-- Complex context-dependent parsing rules (e.g., list item parsing)
-- Precedence and delimiter matching (emphasis, links)
-- HTML block detection rules
-- Line-ending normalization
-
 By leveraging the mdast ecosystem, we get:
 
-- Proven correctness (100% spec compliance)
-- Compatibility with the rich mdast plugin ecosystem
-- Easier maintenance and updates
+- **Plugin Reusability**: Same extensions work across editors, renderers, and linters
+- **Proven Correctness**: 100% CommonMark spec compliance
+- **Unified Experience**: Consistent tooling for editing, rendering, and linting workflows
+- **Rich Ecosystem**: Access to the extensive collection of mdast and micromark plugins
+- **Easier Maintenance**: Updates and bug fixes come from upstream mdast packages
+
+This design prioritizes specification compliance and ecosystem integration. For typical document editing scenarios, the performance is sufficient and the benefits of unified tooling outweigh the trade-offs.
 
 ## Testing
 

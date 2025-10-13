@@ -1,6 +1,6 @@
 {
-  "name": "lezer-markdown",
-  "description": "A Lezer grammar for parsing CommonMark using micromark",
+  "name": "lezer-mdast-markdown",
+  "description": "A Lezer parser for Markdown leveraging the mdast ecosystem",
   "private": false,
   "version": "0.1.0",
   "type": "module",
@@ -18,11 +18,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Sec-ant/lezer-markdown.git"
+    "url": "https://github.com/Sec-ant/lezer-mdast-markdown.git"
   },
-  "homepage": "https://github.com/Sec-ant/lezer-markdown",
+  "homepage": "https://github.com/Sec-ant/lezer-mdast-markdown",
   "bugs": {
-    "url": "https://github.com/Sec-ant/lezer-markdown/issues",
+    "url": "https://github.com/Sec-ant/lezer-mdast-markdown/issues",
     "email": "zezhengwu@proton.me"
   },
   "keywords": [

@@ -1,7 +1,7 @@
 /**
- * lezer-markdown: Markdown parser for CodeMirror 6
- * Supports CommonMark and GFM specifications
- * 100% compliant with mdast-util-from-markdown
+ * lezer-mdast-markdown: Markdown parser for CodeMirror 6
+ * Leverages the mdast ecosystem for extensible Markdown support
+ * 100% compliant with CommonMark specification
  */
 
 // ============================================================================
