@@ -13,7 +13,7 @@ import {
 } from "@lezer/common";
 import type { Options as FromMarkdownOptions } from "mdast-util-from-markdown";
 import { fromMarkdown } from "mdast-util-from-markdown";
-import type { PropConfig } from "./node-definitions";
+import type { NodePropMaps } from "./node-definitions";
 import { createNodeSet } from "./node-definitions";
 import { mdastToLezerTree } from "./transform";
 
@@ -23,29 +23,31 @@ import { mdastToLezerTree } from "./transform";
 export interface ParserOptions extends FromMarkdownOptions {
   /**
    * Additional node property configurations for custom MDAST node types.
-   * Use the exported `defineNodeProps` helper to create type-safe configurations.
+   * Keys should be PascalCase node type names (following Lezer convention).
    *
    * @example
    * ```ts
-   * import { defineNodeProps, createParser } from 'lezer-mdast-markdown';
+   * import { createParser, metaProp } from 'lezer-mdast-markdown';
    * import { NodeProp } from '@lezer/common';
    * import { directive, directiveFromMarkdown } from 'micromark-extension-directive';
-   * import type { TextDirective } from 'mdast-util-directive';
    *
    * const directiveNameProp = new NodeProp<string>({ perNode: true });
    *
    * const parser = createParser({
    *   extensions: [directive()],
    *   mdastExtensions: [directiveFromMarkdown()],
-   *   nodeProps: [
-   *     defineNodeProps<TextDirective>('textDirective', {
+   *   nodeProps: {
+   *     TextDirective: {
    *       name: directiveNameProp,
-   *     }),
-   *   ],
+   *     },
+   *     Math: {
+   *       meta: metaProp,
+   *     },
+   *   },
    * });
    * ```
    */
-  nodeProps?: PropConfig[];
+  nodeProps?: NodePropMaps;
 }
 
 /**
@@ -172,9 +174,9 @@ function inputToString(input: Input): string {
  */
 export function createParser(options: ParserOptions = {}): MarkdownParser {
   // Extract node types from nodeProps if provided
-  const additionalNodeTypes = options.nodeProps?.map(
-    (config) => config.nodeType,
-  );
+  const additionalNodeTypes = options.nodeProps
+    ? Object.keys(options.nodeProps)
+    : undefined;
 
   const { nodeSet, encoder, nodeTypeIds } = createNodeSet(additionalNodeTypes);
   return new MarkdownParser(nodeSet, encoder, nodeTypeIds, options);

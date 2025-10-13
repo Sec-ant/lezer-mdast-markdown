@@ -11,7 +11,7 @@
  */
 
 import { NodeProp, NodeSet, NodeType } from "@lezer/common";
-import { pascalCase } from "es-toolkit";
+import { camelCase, pascalCase } from "es-toolkit";
 import type {
   Code,
   Definition,
@@ -60,7 +60,10 @@ type NodePropMapping<T> = {
  * };
  * ```
  */
-export type NodePropMaps = Record<string, Record<string, NodeProp<unknown>>>;
+export type NodePropMaps = Record<
+  PascalCase<string>,
+  Record<string, NodeProp<unknown>>
+>;
 
 /**
  * Extract MDAST node type from PascalCase key.
@@ -80,42 +83,6 @@ type MdastNodeFromPascalKey<K extends string> = Extract<
 type NodePropDefsConstraint = {
   [K in PascalCase<Nodes["type"]>]?: NodePropMapping<MdastNodeFromPascalKey<K>>;
 };
-
-// Base node interface for any MDAST-like node
-interface BaseNode {
-  type: string;
-}
-
-// Configuration for node properties - returned by defineNodeProps helper
-export type PropConfig = {
-  nodeType: string;
-  props: Record<string, NodeProp<unknown>>;
-};
-
-/**
- * Helper function for type-safe node property configuration.
- * Used internally for built-in MDAST nodes and exported for user extensions.
- *
- * @example
- * ```ts
- * import { createNodePropConfig } from 'lezer-mdast-markdown';
- * import type { TextDirective } from 'mdast-util-directive';
- *
- * const config = createNodePropConfig<TextDirective>('textDirective', {
- *   name: directiveNameProp,
- *   attributes: directiveAttrProp,
- * });
- * ```
- */
-export function createNodePropConfig<T extends BaseNode>(
-  nodeType: T["type"],
-  props: NodePropMapping<T>,
-): PropConfig {
-  return {
-    nodeType,
-    props: props as Record<string, NodeProp<unknown>>,
-  };
-}
 
 // ============================================================================
 // NodeProp Instances - Types extracted from MDAST
@@ -268,45 +235,47 @@ export const NODE_PROP_DEFS = {
 // ============================================================================
 
 /**
- * Built-in MDAST node types from CommonMark, GFM, and Frontmatter specifications.
- * TypeScript ensures these are valid MDAST node type names.
+ * Built-in node types from CommonMark, GFM, and Frontmatter specifications.
+ * Uses PascalCase naming convention (Lezer style).
  */
-export const BUILTIN_MDAST_NODE_TYPES = [
-  "root",
-  "paragraph",
-  "heading",
-  "thematicBreak",
-  "blockquote",
-  "code",
-  "list",
-  "listItem",
-  "html",
-  "definition",
-  "text",
-  "emphasis",
-  "strong",
-  "inlineCode",
-  "break",
-  "link",
-  "image",
-  "linkReference",
-  "imageReference",
-  "footnoteReference",
-  "footnoteDefinition",
+export const BUILTIN_NODE_TYPES = [
+  "Root",
+  "Paragraph",
+  "Heading",
+  "ThematicBreak",
+  "Blockquote",
+  "Code",
+  "List",
+  "ListItem",
+  "Html",
+  "Definition",
+  "Text",
+  "Emphasis",
+  "Strong",
+  "InlineCode",
+  "Break",
+  "Link",
+  "Image",
+  "LinkReference",
+  "ImageReference",
+  "FootnoteReference",
+  "FootnoteDefinition",
   // GFM extensions
-  "table",
-  "tableRow",
-  "tableCell",
-  "delete", // strikethrough
+  "Table",
+  "TableRow",
+  "TableCell",
+  "Delete", // strikethrough
   // Frontmatter (YAML only, most common format)
-  "yaml",
-] as const satisfies ReadonlyArray<Nodes["type"]>;
+  "Yaml",
+] as const satisfies ReadonlyArray<PascalCase<Nodes["type"]>>;
 
-export type BuiltinMdastNodeType = (typeof BUILTIN_MDAST_NODE_TYPES)[number];
+export type BuiltinNodeType = (typeof BUILTIN_NODE_TYPES)[number];
 
 /**
  * Create a NodeSet with dynamic node types support.
  * Allows users to add custom node types for extensions.
+ *
+ * @param additionalTypes - Additional node types in PascalCase (e.g., ["Math", "InlineMath"])
  */
 export function createNodeSet(additionalTypes: string[] = []): {
   nodeSet: NodeSet;
@@ -314,7 +283,7 @@ export function createNodeSet(additionalTypes: string[] = []): {
   nodeTypeIds: Record<string, number>;
 } {
   // Combine built-in types with additional types
-  const allTypes = [...BUILTIN_MDAST_NODE_TYPES, ...additionalTypes];
+  const allTypes = [...BUILTIN_NODE_TYPES, ...additionalTypes];
   // Remove duplicates while preserving order
   const uniqueTypes = Array.from(new Set(allTypes));
 
@@ -325,8 +294,8 @@ export function createNodeSet(additionalTypes: string[] = []): {
     ...uniqueTypes.map((type, index) =>
       NodeType.define({
         id: index + 1,
-        name: pascalCase(type),
-        top: type === "root",
+        name: type,
+        top: type === "Root",
       }),
     ),
   ];
@@ -334,8 +303,11 @@ export function createNodeSet(additionalTypes: string[] = []): {
   // Create NodeSet with syntax highlighting applied to all nodes
   const nodeSet = new NodeSet(nodeTypes).extend(markdownHighlighting);
 
-  // Create encoder: MDAST type string → NodeType ID
-  const typeToId = new Map(uniqueTypes.map((type, index) => [type, index + 1]));
+  // Create encoder: MDAST type string (camelCase) → NodeType ID
+  // Convert PascalCase to camelCase for MDAST type matching
+  const typeToId = new Map(
+    uniqueTypes.map((type, index) => [camelCase(type), index + 1]),
+  );
   const encoder = (type: string): number => {
     const id = typeToId.get(type);
     if (id === undefined) {
@@ -374,11 +346,9 @@ export function collectProps(
   customMaps?: NodePropMaps,
 ): Array<[NodeProp<unknown>, unknown]> {
   // Convert MDAST camelCase type to PascalCase for lookup
-  const pascalKey = pascalCase(node.type);
+  const pascalKey = pascalCase(node.type) as PascalCase<string>;
   const propMap =
-    (NODE_PROP_DEFS as Record<string, Record<string, NodeProp<unknown>>>)[
-      pascalKey
-    ] || customMaps?.[pascalKey];
+    (NODE_PROP_DEFS as NodePropMaps)[pascalKey] || customMaps?.[pascalKey];
   if (!propMap) return [];
 
   const props: Array<[NodeProp<unknown>, unknown]> = [];
@@ -432,16 +402,13 @@ export function collectNodeProps(
   // Merge built-in and custom mappings
   const allMaps = customMaps
     ? {
-        ...(NODE_PROP_DEFS as Record<
-          string,
-          Record<string, NodeProp<unknown>>
-        >),
+        ...(NODE_PROP_DEFS as NodePropMaps),
         ...customMaps,
       }
-    : (NODE_PROP_DEFS as Record<string, Record<string, NodeProp<unknown>>>);
+    : (NODE_PROP_DEFS as NodePropMaps);
 
   // Look up props for this node type (already PascalCase)
-  const propMap = allMaps[node.type.name];
+  const propMap = allMaps[node.type.name as PascalCase<string>];
   if (!propMap || !node.tree) return result;
 
   // Collect all defined properties

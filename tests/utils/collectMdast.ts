@@ -1,6 +1,6 @@
-import type { NodeProp } from "@lezer/common";
 import { pascalCase } from "es-toolkit";
 import type { Node, Parent } from "mdast";
+import type { PascalCase } from "type-fest";
 import type { NodePropMaps } from "../../src/index";
 import { NODE_PROP_DEFS } from "../../src/node-definitions";
 import type { NormalizedNode } from "../types";
@@ -19,18 +19,15 @@ export function collectMdast(
   // Merge built-in and custom props maps
   const allMaps = customMaps
     ? {
-        ...(NODE_PROP_DEFS as Record<
-          string,
-          Record<string, NodeProp<unknown>>
-        >),
+        ...(NODE_PROP_DEFS as NodePropMaps),
         ...customMaps,
       }
-    : (NODE_PROP_DEFS as Record<string, Record<string, NodeProp<unknown>>>);
+    : (NODE_PROP_DEFS as NodePropMaps);
 
   // Collect props from node based on node type
   // MDAST uses camelCase, but our config keys are PascalCase
   const props: Record<string, unknown> = {};
-  const propMap = allMaps[pascalCase(node.type)];
+  const propMap = allMaps[pascalCase(node.type) as PascalCase<string>];
   if (propMap) {
     for (const key of Object.keys(propMap)) {
       const value = (node as unknown as Record<string, unknown>)[key];

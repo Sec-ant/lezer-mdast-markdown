@@ -180,7 +180,7 @@ title: My Document
 
 ### Extensions Requiring Custom Node Properties
 
-For extensions not covered by mdast's standard types, you need to define custom node properties using `customMaps`:
+For extensions not covered by mdast's standard types, you need to define custom node properties using `nodeProps`:
 
 #### Math Extension Example
 
@@ -193,7 +193,7 @@ import { mathFromMarkdown } from "mdast-util-math";
 const parser = createParser({
   extensions: [math()],
   mdastExtensions: [mathFromMarkdown()],
-  customMaps: {
+  nodeProps: {
     // Reuse built-in metaProp for block math
     Math: { meta: metaProp },
     InlineMath: {},
@@ -229,7 +229,7 @@ const directiveNameProp = new NodeProp<string>({ perNode: true });
 const parser = createParser({
   extensions: [directive()],
   mdastExtensions: [directiveFromMarkdown()],
-  customMaps: {
+  nodeProps: {
     TextDirective: {
       name: directiveNameProp,
     },
@@ -302,7 +302,7 @@ Creates a custom parser instance with extended functionality.
 
 - `extensions`: micromark syntax extensions
 - `mdastExtensions`: mdast conversion extensions
-- `customMaps`: Custom node property mappings (type: `NodePropMaps`)
+- `nodeProps`: Custom node property mappings (type: `NodePropMaps`). Keys should be PascalCase node type names.
 
 ### `collectProps(node, customMaps?)`
 

@@ -13,7 +13,6 @@ import { gfm } from "micromark-extension-gfm";
 import { math } from "micromark-extension-math";
 import {
   collectNodeProps,
-  createNodePropConfig,
   createParser,
   markdown,
   metaProp,
@@ -21,21 +20,23 @@ import {
 } from "../src/index";
 import initialDoc from "./example.md?raw";
 
-// Create parser with GFM, Frontmatter, and Math support
-const parser = createParser({
+const PARSER_OPTIONS = {
   extensions: [gfm(), frontmatter(["yaml"]), math()],
   mdastExtensions: [
     gfmFromMarkdown(),
     frontmatterFromMarkdown(["yaml"]),
     mathFromMarkdown(),
   ],
-  nodeProps: [
-    createNodePropConfig("math", {
+  nodeProps: {
+    Math: {
       meta: metaProp,
-    }),
-    createNodePropConfig("inlineMath", {}),
-  ],
-});
+    },
+    InlineMath: {},
+  },
+};
+
+// Create parser with GFM, Frontmatter, and Math support
+const parser = createParser(PARSER_OPTIONS);
 
 // Custom props config for math extension (PascalCase keys, Record format)
 const customPropsConfig: NodePropMaps = {
@@ -127,15 +128,12 @@ function updateParserInfo(view: EditorView) {
   }
 }
 
-// Create CodeMirror editor with GFM support
+// Create CodeMirror editor with GFM, Frontmatter, and Math support
 const startState = EditorState.create({
   doc: initialDoc,
   extensions: [
     basicSetup,
-    markdown({
-      extensions: [gfm()],
-      mdastExtensions: [gfmFromMarkdown()],
-    }),
+    markdown(PARSER_OPTIONS),
     vscodeLight,
     EditorView.updateListener.of((update: ViewUpdate) => {
       if (update.docChanged) {

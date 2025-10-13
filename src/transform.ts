@@ -1,9 +1,9 @@
 /**
  * MDAST to Lezer Tree transformer with property preservation
  */
-import { type NodeProp, type NodeSet, Tree } from "@lezer/common";
+import { type NodeSet, Tree } from "@lezer/common";
 import type { Nodes, Root } from "mdast";
-import { collectProps, type PropConfig } from "./node-definitions";
+import { collectProps, type NodePropMaps } from "./node-definitions";
 
 /**
  * Convert MDAST tree to Lezer Tree with preserved properties
@@ -13,15 +13,8 @@ export function mdastToLezerTree(
   text: string,
   nodeSet: NodeSet,
   encoder: (type: string) => number,
-  customPropConfigs?: PropConfig[],
+  customMaps?: NodePropMaps,
 ): Tree {
-  // Build custom property maps if provided
-  const customMaps = customPropConfigs
-    ? Object.fromEntries(
-        customPropConfigs.map((config) => [config.nodeType, config.props]),
-      )
-    : undefined;
-
   /**
    * Recursively build Tree from MDAST node
    */
@@ -44,10 +37,7 @@ export function mdastToLezerTree(
     }
 
     // Collect node properties (built-in + custom)
-    const props = collectProps(
-      node,
-      customMaps as Record<string, Record<string, NodeProp<unknown>>>,
-    );
+    const props = collectProps(node, customMaps);
 
     return new Tree(
       nodeType,

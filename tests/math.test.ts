@@ -6,7 +6,7 @@ import { fromMarkdown } from "mdast-util-from-markdown";
 import { mathFromMarkdown } from "mdast-util-math";
 import { math } from "micromark-extension-math";
 import { describe, expect, test } from "vitest";
-import { createNodePropConfig, createParser, metaProp } from "../src";
+import { createParser, metaProp } from "../src";
 import type { Fixture } from "./types";
 import { collectLezer } from "./utils/collectLezer";
 import { collectMdast } from "./utils/collectMdast";
@@ -22,20 +22,20 @@ describe("Math Tests", () => {
   const mathParser = createParser({
     extensions: [math()],
     mdastExtensions: [mathFromMarkdown()],
-    nodeProps: [
+    nodeProps: {
       // Block math node with optional meta (reuse built-in metaProp)
-      createNodePropConfig("math", {
+      Math: {
         meta: metaProp,
-      }),
+      },
       // Inline math node (no extra props)
-      createNodePropConfig("inlineMath", {}),
-    ],
+      InlineMath: {},
+    },
   });
 
-  // Custom props config for test utils
+  // Custom props config for test utils (PascalCase keys)
   const mathPropsConfig = {
-    math: [{ key: "meta", prop: metaProp }],
-    inlineMath: [],
+    Math: { meta: metaProp },
+    InlineMath: {},
   };
 
   for (const [path, fixtures] of Object.entries(modules)) {

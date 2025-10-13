@@ -22,16 +22,8 @@ export { createParser, MarkdownParser, parser } from "./parser";
 // Extension API - For Custom Node Properties
 // ============================================================================
 
-export type {
-  NodeAttributes,
-  NodePropMaps,
-  PropConfig,
-} from "./node-definitions";
-export {
-  collectNodeProps,
-  collectProps,
-  createNodePropConfig,
-} from "./node-definitions";
+export type { NodeAttributes, NodePropMaps } from "./node-definitions";
+export { collectNodeProps, collectProps } from "./node-definitions";
 
 // ============================================================================
 // Built-in NodeProp Instances - For Reuse in Extensions

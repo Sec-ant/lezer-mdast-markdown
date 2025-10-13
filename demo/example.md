@@ -134,6 +134,13 @@ $$
 a^2 + b^2 = c^2
 $$
 
+Math block with meta:
+
+$$
+meta-info
+a^2 + b^2 = c^2
+$$
+
 Maxwell's equations:
 
 $$
