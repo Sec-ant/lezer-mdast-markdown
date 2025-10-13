@@ -58,6 +58,7 @@
     "build:es": "vite build",
     "build:cjs": "tsx ./scripts/build-cjs.ts",
     "build": "conc \"pnpm:build:es\" \"pnpm:build:cjs\"",
+    "build:site": "vite build --config vite.config.site.ts",
     "postbuild:es": "tsc --declarationDir ./dist/es",
     "postbuild:cjs": "tsc --declarationDir ./dist/cjs",
     "preview": "vite preview",

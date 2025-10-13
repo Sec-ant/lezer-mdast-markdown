@@ -1,0 +1,32 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write # Needed for auth with Deno Deploy
+      contents: read # Needed to clone the repository
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Build step
+        run: pnpm -s build:site
+
+      - name: Upload to Deno Deploy
+        uses: denoland/deployctl@7bded90d0d09cd99bbfb513966146315db97618b # 1.13.1
+        with:
+          project: lezer-mdast-markdown
+          entrypoint: https://deno.land/std/http/file_server.ts
+          root: dist
