@@ -59,7 +59,6 @@
     "build": "conc \"pnpm:build:es\" \"pnpm:build:cjs\"",
     "postbuild:es": "tsc --declarationDir ./dist/es",
     "postbuild:cjs": "tsc --declarationDir ./dist/cjs",
-    "postbuild": "tsx ./scripts/post-process-types.ts",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
