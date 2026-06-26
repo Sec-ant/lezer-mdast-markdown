@@ -69,7 +69,7 @@
     "prepublishOnly": "pnpm -s build"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.5",
+    "@biomejs/biome": "2.5.1",
     "@changesets/cli": "^2.29.7",
     "@codemirror/language": "^6.11.3",
     "@codemirror/state": "^6.5.2",
